@@ -1,0 +1,514 @@
+ /* Link to font IBM Plex Sans Thai  */
+ @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
+ /* Link to font IBM Plex Sans Thai  */
+ @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@500&display=swap');
+
+
+ body {
+   background-color: var(--bs-info);
+   /* background-image: url("../picture/office.jpg");
+  background-size: cover; */
+ }
+
+ .square {
+   width: 100px;
+   height: 100px;
+   overflow: hidden;
+   /* This ensures the image doesn't overflow the square */
+ }
+
+ button.btn.btn-outline-primary {
+   color: white;
+   background-color: red;
+   border: var(--bs-btn-border-width) solid red;
+ }
+
+ button.btn.btn-primary.mb-2 {
+   width: 9%;
+   padding-bottom: 6px;
+ }
+
+ /* --------------------------------------------comments ------------------------------------------- */
+
+ #buttonsend {
+   border-bottom-left-radius: 5px;
+   border-top-left-radius: 5px;
+ }
+
+ input#comment {
+   border-bottom-right-radius: 5px;
+   border-top-right-radius: 5px;
+ }
+
+ .col-1.message-box {
+   width: 3.333333%;
+ }
+
+
+
+ /* --------------------------------------------font  ------------------------------------------- */
+
+ i.ms-2.fs-5{
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+ ้.col.ms-3{
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+
+ /* --------------------------------------------font ------------------------------------------- */
+
+ .card-header,
+ .col-12.col-md-6.col-lg-3.mb-4.mb-lg-0,
+ ol.breadcrumb {
+   font: bolder;
+   font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+
+ #hanging-icons {
+   font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+
+
+ .col.align-self-start {
+   font-size: larger;
+   font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+
+ h1.h2,
+ .col-4.col-lx-2 {
+   font-family: 'Varela Round', sans-serif;
+
+ }
+
+ .position-sticky {
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ /*  modal */
+ h1#exampleModalLabel {
+   font-weight: bold;
+   font-size: 46px;
+   font-family: 'Varela Round', sans-serif;
+   color: #4e73df;
+ }
+ label.form-label,h4.mb-3{
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+ }
+ 
+
+ label.form-label {
+   font-weight: bold;
+   font-size: large;
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ input.form-control {
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ select#selectbox {
+   width: auto;
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ #ProjectDocuments {
+   font-size: large;
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ /* --------------------------------------------font upload documents------------------------------------------- */
+ button.accordion-button.collapsed {
+   font-size: large;
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ button.accordion-button {
+   font-size: 24px;
+   font-family: 'Varela Round', sans-serif;
+ }
+
+ /* -------------------------------------------- index page ------------------------------------------- */
+ #cardrule {
+   background: #F0F0F0;
+ }
+
+ #cardappoint {
+   background: #98D8AA;
+ }
+
+ #carddocument {
+   background: #F45050;
+   color: #ffffff;
+ }
+
+ #cardlogin {
+   background: #3C486B;
+   color: #ffffff;
+ }
+
+ #cardlogindetail {
+   background: #7fffd4;
+   color: #611A1A;
+ }
+
+ /* -------------------------------------------- std page ------------------------------------------- */
+ #cardrule2 {
+   background: #F3AA60;
+   color: #301A03;
+ }
+
+ #cardappoint2 {
+   background: #EF6262;
+   color: #ffffff;
+ }
+
+ #carddocument2 {
+   background: #468B97;
+   color: #ffffff;
+ }
+
+ #cardassessment2 {
+   background: #1D5B79;
+   color: #ffffff;
+ }
+
+ /* -------------------------------------------- border card in body dashboard ------------------------------------------- */
+ .card.shadow {
+   border: none;
+ }
+
+ .card.shadow-sm {
+   width: auto;
+   overflow-x: auto;
+   background: none;
+ }
+
+ #card_CSV {
+   width: auto;
+ }
+
+
+ /* -------------------------------------------- table card  ------------------------------------------- */
+ table.table {
+   text-align: center;
+   align-items: center;
+   /* จัดให้เนื้อหาอยู่กึ่งกลางในแกน Y */
+ }
+
+ th {
+   vertical-align: middle;
+   /* จัดให้เนื้อหาอยู่กึ่งกลางในแกน Y */
+ }
+
+ td {
+   vertical-align: middle;
+   /* จัดให้เนื้อหาอยู่กึ่งกลางในแกน Y */
+ }
+
+ .border-left-primary {
+   border-left: 0.25rem solid #4e73df !important;
+ }
+
+ .border-left-success {
+   border-left: 0.25rem solid #1cc88a !important;
+ }
+
+ .border-left-info {
+   border-left: 0.25rem solid #36b9cc !important;
+ }
+
+ .border-left-warning {
+   border-left: 0.25rem solid #f6c23e !important;
+ }
+
+ .border-left-danger {
+   border-left: 0.25rem solid #e74a3b !important;
+ }
+
+ /* ------------------------------------------------------header ----------------------------------------------------- */
+ .fs-4 {
+   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+ }
+
+ .HeaderBg {
+   background-color: #F9D949;
+   box-shadow: inset -1px 0 0 rgb(0, 0, 0, 0.1);
+
+ }
+
+ .col-1.text-end {
+   /* ----------- position Admin header  -------------- */
+
+   position: relative;
+   left: 6rem;
+   width: 9%;
+ }
+
+ /* ----------- position Admin Result Teacher  -------------- */
+
+ a.btn.btn-primary.text-white.mt-2.ml-auto {
+   position: relative;
+   top: -6px;
+ }
+
+ a.btn.btn-info.text-white.mt-2{
+  width: 100%;
+ }
+
+/* ----------- All Admin btn-danger  -------------- */
+ a.btn.btn-danger.mt-2{
+  width: 100%;
+ }
+
+
+ /* ------------------------------------------------------login color ----------------------------------------------------- */
+ .inputlogin {
+   background: none;
+ }
+
+ #boxlogin {
+   /* login box*/
+   position: relative;
+   top: 3em;
+ }
+
+ #backgroundlogin {
+   background-image: url("../picture/office.jpg");
+   background-size: cover;
+ }
+
+ #cardloginright {
+   background: rgba(255, 255, 255, 0.6);
+ }
+
+ /* ------------------------------------------------------upload bar ----------------------------------------------------- */
+ input#formFileMultiple.form-control {
+   width: auto;
+   display: inline;
+ }
+
+ .accordion {
+   /* width: 91%;
+  padding-left: 87px; */
+   width: auto;
+ }
+ button.btn.btn-primary.ms-3.ms-3 {
+  width: 16em;
+}
+
+ /* ------------------------------------------------------ Message box ----------------------------------------------------- */
+ #messagebox {
+   flex: 0 0 auto;
+   width: 2.9%;
+ }
+
+ #hiddenContent {
+   display: none;
+ }
+
+
+ /* ------------------------------------------------------ hidden scroll ------------------------------------------------------ */
+ /* html {
+   overflow: scroll;
+   overflow-x: hidden;
+ }
+
+ ::-webkit-scrollbar {
+   width: 0;
+   class="btn btn-danger">Delete</a>
+   background: transparent;
+   class="btn btn-danger">Delete</a>
+ } */
+
+ /* Optional: show position indicator in red */
+ ::-webkit-scrollbar-thumb {
+   background: #FF0000;
+ }
+
+ select#selectbox {
+
+   overflow-y: auto;
+   /* เปิดใช้งานการเลื่อนเมาส์ */
+ }
+
+ /* ------------------------------------------ input textarea appointmanage --------------------------------------------- */
+ #inputnews_text,
+ #description,
+ #input_news_text {
+   min-height: 12.5rem;
+ }
+
+ textarea#input_project_nameTH,
+ textarea#input_project_nameENG {
+   min-height: 5rem;
+ }
+
+ textarea#inputproject_nameTH,
+ textarea#inputproject_nameENG {
+   min-height: 7rem;
+ }
+
+ /* ------------------------------------------------------side menu------------------------------------------------------- */
+ /* .sidenav {
+  height: 100%;
+  width: 0%;
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  background-color: #f2f2f2;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 10px;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 20px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav p {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #ff3636;
+  display: block;
+  transition: 0.3s;
+}
+
+
+.sidenav a:hover {
+  color: #f97263;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+span.navbar-toggler-icon {
+  display: table-column;
+} */
+ /* login */
+
+
+ .form-signin {
+
+   max-width: 330px;
+   padding: 15px;
+ }
+
+ form {
+
+   display: block;
+   margin-top: 0em;
+ }
+
+ button.btn.btn-primary {
+   color: white;
+   background-color: red;
+   border: var(--bs-btn-border-width) solid red;
+ }
+
+ .fs-4 {
+   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+ }
+
+ /* --------------------------------------------ul navbar margin ------------------------------------------- */
+
+ ul.nav.flex-column {
+   margin-left: 10px;
+ }
+
+ /* --------------------------------------------navber text center ------------------------------------------- */
+ span.px-2 {
+   position: relative;
+   top: -3px;
+ }
+
+ /* ------------------------------------------ hover side bar --------------------------------------------- */
+ a.nav-link.active {
+   border-top-left-radius: 50px;
+   border-bottom-left-radius: 50px;
+ }
+
+ a.nav-link.active:hover {
+   background-color: #e0e3e7;
+   border-top-left-radius: 50px;
+   border-bottom-left-radius: 50px;
+ }
+
+ /* ------------------------------------------ hover input --------------------------------------------- */
+ .form-control::-ms-input-placeholder {
+   /* Microsoft Edge */
+   color: red;
+ }
+
+ /* --------------------------------------------side bar ------------------------------------------- */
+
+ #sidebar {
+   position: fixed;
+   top: 0;
+   bottom: 0;
+   left: 0;
+   height: 100%;
+   width: 16rem;
+   z-index: 100;
+   padding: 90px 0 0;
+   box-shadow: inset -1px 0 0 rgb(0, 0, 0, 0.1);
+   overflow-y: auto;
+   background-color: #F45050;
+   /* เพิ่มสี background ที่นี่ */
+ }
+
+
+ main.col-md-9.ml-sm-auto.col-lg-10.px-md-3.py-3 {
+   position: relative;
+   padding-right: 1.5rem !important;
+   left: 16.6rem;
+ }
+
+ @media (min-width:768px) {
+   .HeaderBg {
+     top: 0;
+     position: sticky;
+     z-index: 999;
+   }
+ }
+
+ @media (max-width:768px) {
+   #sidebar {
+     height: 100%;
+     top: 8.5rem;
+     padding: 0;
+     z-index: 900;
+   }
+
+   main.col-md-9.ml-sm-auto.col-lg-10.px-md-3.py-3 {
+     position: relative;
+     left: 0rem;
+
+   }
+ }
+
+
+
+
+ /* --------------------------------------------Media ------------------------------------------- */
+
+ /* @media (max-width : 400px) {
+  nav.navbar.navbar-dark{
+      display: flex;
+  }
+  div.row{
+      display: none;
+  }
+} */
