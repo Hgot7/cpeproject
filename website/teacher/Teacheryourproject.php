@@ -8,6 +8,12 @@ if (!isset($_SESSION['teacher_login'])) {
   header('Location: ../index.php');
   exit();
 }
+if (isset($_SESSION['selectedYear'])) {
+  unset($_SESSION['selectedYear']);
+}
+if (isset($_SESSION['selectedTerm'])) {
+  unset($_SESSION['selectedTerm']);
+}
 
 function giveTeacherById($conn, $project_id)
 {
@@ -18,19 +24,21 @@ function giveTeacherById($conn, $project_id)
   $stmt->bindParam(':file_status', $file_status, PDO::PARAM_INT);
   $stmt->execute();
   $rowCount = $stmt->rowCount();
-  
+
   $sql = "SELECT grade FROM `student` WHERE student_id = (SELECT student_id1 FROM `project` WHERE project_id = :project_id)";
   $stmt = $conn->prepare($sql);
   $stmt->bindParam(':project_id', $project_id);
   $stmt->execute();
   $studentGrade = $stmt->fetchColumn();
 
-
   // ดึงจำนวนแถวทั้งหมดที่ผลลัพธ์จากคำสั่ง SQL
-  
+
   $rowCountNum = 100 / 14;
-  if(isset($studentGrade)){return 100;}else{return intval($rowCount * $rowCountNum);}
-  
+  if (isset($studentGrade)) {
+    return 100;
+  } else {
+    return intval($rowCount * $rowCountNum);
+  }
 }
 
 
@@ -90,14 +98,32 @@ function giveTeacherById($conn, $project_id)
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                      if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+                        unset($_SESSION['selectedGroup']);
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+                        $selectedGroup = $_SESSION['selectedGroup'];
+                      }
+
                       $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
+                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                        $yearValue = $datayear['year'];
+                        $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                          <?php echo $yearValue; ?>
                         </option>
                       <?php } ?>
                     </select>
@@ -109,12 +135,16 @@ function giveTeacherById($conn, $project_id)
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `project` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
+                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                        $termValue = $dataterm['term'];
+                        $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                          <?php echo $termValue; ?>
                         </option>
                       <?php } ?>
                     </select>
@@ -122,6 +152,10 @@ function giveTeacherById($conn, $project_id)
 
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                  </div>
+
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                   </div>
 
                 </div>
@@ -146,8 +180,8 @@ function giveTeacherById($conn, $project_id)
                     <?php
                     try {
                       if (isset($_POST['submitfilter'])) {
-                        $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                        $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
 
                         if (empty($selectedYear) && empty($selectedTerm)) {
                           $sql = "SELECT * FROM `project` WHERE teacher_id1 = :id or teacher_id2 = :id
@@ -209,25 +243,25 @@ function giveTeacherById($conn, $project_id)
                         if (empty($filteredData)) {
                           echo "<tr><td colspan='20' class='text-center'>No data available</td></tr>";
                         } else {
-                        $index = 1;
-                        foreach ($filteredData as $data) {
+                          $index = 1;
+                          foreach ($filteredData as $data) {
                     ?>
-                          <tr>
-                            <th scope="row"><?php echo $index++; ?></th>
-                            <td><?php echo $data['project_id']; ?></td>
-                            <td><?php echo ($data['project_nameTH']); ?></td>
-                            <td><?php echo ($data['year']); ?></td>
-                            <td><?php echo ($data['term']); ?></td>
-                            <td>
-                              <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="<?php echo giveTeacherById($conn, $data['project_id']) ?>%" aria-valuemin="0" aria-valuemax="100">
-                                <div class="progress-bar" style="width: <?php echo giveTeacherById($conn, $data['project_id']) ?>%"> <?php echo giveTeacherById($conn, $data['project_id']) ?>% </div>
-                              </div>
-                            </td>
-                            <td><a href="STDUploadfile.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white mb-1">ความคืบหน้า</a></td>
-                          </tr>
+                            <tr>
+                              <th scope="row"><?php echo $index++; ?></th>
+                              <td><?php echo $data['project_id']; ?></td>
+                              <td><?php echo ($data['project_nameTH']); ?></td>
+                              <td><?php echo ($data['year']); ?></td>
+                              <td><?php echo ($data['term']); ?></td>
+                              <td>
+                                <div class="progress" role="progressbar" aria-label="Example with label" aria-valuenow="<?php echo giveTeacherById($conn, $data['project_id']) ?>%" aria-valuemin="0" aria-valuemax="100">
+                                  <div class="progress-bar" style="width: <?php echo giveTeacherById($conn, $data['project_id']) ?>%"> <?php echo giveTeacherById($conn, $data['project_id']) ?>% </div>
+                                </div>
+                              </td>
+                              <td><a href="STDUploadfile.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white mb-1">ความคืบหน้า</a></td>
+                            </tr>
                           <?php }
                         }
-                      }elseif (isset($_POST['viewAll'])) {
+                      } elseif (isset($_POST['viewAll'])) {
                         $sql = "SELECT * FROM `project` WHERE teacher_id1 = :id or teacher_id2 = :id
                         ORDER BY year DESC, term DESC";
                         $stmt = $conn->prepare($sql);
@@ -256,11 +290,10 @@ function giveTeacherById($conn, $project_id)
                                 <a href="statusproject.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white mb-1">สถานะโครงงาน</a>
                               </td>
                             </tr>
-                    <?php
+                          <?php
                           }
                         }
-
-                      }else {
+                      } else {
                         $sql = "SELECT * FROM `project` WHERE teacher_id1 = :id or teacher_id2 = :id
                         ORDER BY year DESC, term DESC";
                         $stmt = $conn->prepare($sql);

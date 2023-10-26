@@ -36,6 +36,7 @@ session_start();
     <div class="container px-4">
       <div class="row g-4 py-5 row-cols-2 row-cols-lg-2">
         <div class="col">
+          
 
           <h3 class="fs-1 pb-2 border-bottom">รายละเอียด</h3>
           <div class="card shadow my-3" id="cardrule">
@@ -62,6 +63,7 @@ session_start();
                   <i class="bi bi-flag-fill" width="1em" height="1em"></i>
                 </div>
                 <div>
+              
                   <h3 class="fs-3 text-body-light">กำหนดการในรายวิชา</h3>
                   <p>Click here เพื่ออ่านรายละเอียดเพิ่มเติม</p>
                   <a href="#" class="btn btn-primary">

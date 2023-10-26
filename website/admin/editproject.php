@@ -2,6 +2,13 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
+
+
 if (isset($_POST['update'])) {
   $project_id = $_POST['id'];
   $New_project_nameTH = $_POST['input_project_nameTH'];
@@ -16,42 +23,55 @@ if (isset($_POST['update'])) {
   $New_referee_id2 = $_POST['input_referee_id2'];
   $New_group_id = $_POST['input_group_id'];
 
+
+  
   if (isset($_FILES["input_boundary_path"]) && $_FILES["input_boundary_path"]["size"] > 0) {
     $targetDir = "uploadfileBoundary/";
     $New_boundary_path = basename($_FILES["input_boundary_path"]["name"]);
     $targetFile = $targetDir . $New_boundary_path;
     $uploadOk = 1;
     $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    
+    // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
+    echo "<script>hideLoading();</script";
 
     if ($uploadOk == 1) {
-      // ดำเนินการตรวจสอบชื่อไฟล์ซ้ำ
-      $stmt = $conn->prepare("SELECT boundary_path FROM `project` WHERE boundary_path = :input_boundary_path");
-      $stmt->bindParam(':input_boundary_path', $New_boundary_path);
-      $stmt->execute();
-      $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
+        // ดำเนินการตรวจสอบชื่อไฟล์ซ้ำในฐานข้อมูล
+        $stmt = $conn->prepare("SELECT boundary_path FROM `project` WHERE boundary_path = :input_boundary_path");
+        $stmt->bindParam(':input_boundary_path', $New_boundary_path);
+        $stmt->execute();
+        $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      if ($existingFile) {
-        $_SESSION['error'] = 'ชื่อไฟล์ซ้ำกันในระบบ ไม่สามารถอัปโหลดได้';
-        header('location: editproject.php?id='.$project_id);
-        exit();
-      } else {
+        if (file_exists($targetFile)) {
+            $filename = pathinfo($New_boundary_path, PATHINFO_FILENAME); // ดึงชื่อไฟล์แต่ไม่รวมนามสกุล
+            $file_extension = pathinfo($New_boundary_path, PATHINFO_EXTENSION); // ดึงนามสกุลไฟล์
+
+            $counter = 1;
+            while (file_exists($targetFile)) {
+                // เพิ่มเลขต่อท้ายชื่อไฟล์
+                $New_boundary_path = $filename . '_' . $counter . '.' . $file_extension;
+                $targetFile = $targetDir . $New_boundary_path;
+                $counter++;
+            }
+        }
 
         if (move_uploaded_file($_FILES["input_boundary_path"]["tmp_name"], $targetFile)) {
-          // เพิ่มข้อมูลลงในฐานข้อมูล
+            // ทำการอัปเดตข้อมูลลงในฐานข้อมูล หรือเพิ่มข้อมูลลงในฐานข้อมูล
+            // แต่คำสั่ง SQL หรือเพิ่มข้อมูลลงในฐานข้อมูลไม่ได้ระบุในโค้ดนี้
         } else {
-          $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
-          header('location: editproject.php?id='.$project_id);
-          exit();
+            $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
+            header('location: editproject.php?id=' . $project_id);
+            exit();
         }
-      }
     } else {
-      $_SESSION['error'] = 'กรุณาเลือกไฟล์ใหม่ที่ต้องการอัปโหลด';
-      header('location: editproject.php?id='.$project_id);
-      exit();
+        $_SESSION['error'] = 'กรุณาเลือกไฟล์ใหม่ที่ต้องการอัปโหลด';
+        header('location: editproject.php?id=' . $project_id);
+        exit();
     }
-  } else {
+} else {
     $New_boundary_path = ""; // กำหนดค่าเป็นค่าว่างเมื่อไม่มีไฟล์ถูกอัปโหลด
-  }
+}
+
 
   // $New_grade = $_POST['input_grade'];
   $New_year = $_POST['input_year'];
@@ -112,7 +132,8 @@ if (isset($_POST['update'])) {
 
       $sql->execute();
       if ($sql) {
-        $_SESSION['success'] = '<strong>โครงงาน </strong>' . $project_id . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
+
+        $_SESSION['success'] = '<strong>โครงงาน </strong>' . $New_project_nameTH . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
         header("location: ./projectmanage.php");
         exit();
       } else {
@@ -174,29 +195,29 @@ if (isset($_POST['update'])) {
         <h1 class="h2" style="font-family: 'IBM Plex Sans Thai', sans-serif;">แก้ไขข้อมูลโปรเจคในรายวิชา</h1>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb fs-5 mt-3 ms-3">
-          <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
+            <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
             <li class="breadcrumb-item"><a href="./projectmanage.php">จัดการข้อมูลโครงงาน</a></li>
             <li class="breadcrumb-item active" aria-current="page">แก้ไขข้อมูลโปรเจคในรายวิชา</li>
           </ol>
         </nav>
         <?php if (isset($_SESSION['error'])) { ?>
-            <div class="alert alert-danger" role="alert">
-              <?php
-              echo $_SESSION['error'];
-              unset($_SESSION['error']);
-              ?></div>
-          <?php  } ?>
-          <?php if (isset($_SESSION['success'])) { ?>
-            <div class="alert alert-success" role="alert">
-              <?php
-              echo $_SESSION['success'];
-              unset($_SESSION['success']);
-              ?></div>
-          <?php  } ?>
+          <div class="alert alert-danger" role="alert">
+            <?php
+            echo $_SESSION['error'];
+            unset($_SESSION['error']);
+            ?></div>
+        <?php  } ?>
+        <?php if (isset($_SESSION['success'])) { ?>
+          <div class="alert alert-success" role="alert">
+            <?php
+            echo $_SESSION['success'];
+            unset($_SESSION['success']);
+            ?></div>
+        <?php  } ?>
 
         <div class="row">
           <div class="col-12 col-xl-8 mb-4 mb-lg-0" style="width: 100%;">
-            <form action="./editproject.php" method="post" enctype="multipart/form-data">
+            <form action="./editproject.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form1')">
               <?php
               $data = [];
               if (isset($_GET['id'])) {
@@ -210,27 +231,27 @@ if (isset($_POST['update'])) {
               <input type="hidden" name="id" value="<?php echo $data['project_id'] ?? ''; ?>">
 
               <div class="pt-3 justify-content-center">
-                <label class="form-label">รหัสกลุ่มโครงงาน</label>
+                <label class="form-label">รหัสกลุ่มโครงงาน<span style="color: red;"> *</span></label>
                 <input type="text" class="form-control" name="new_project_id" placeholder="25xx-xxx" required value="<?php echo $data['project_id'] ?? ''; ?>" placeholder="รหัสโครงงาน" readonly>
               </div>
 
 
-              <label class="form-label">ชื่อโครงงานภาษาไทย</label>
+              <label class="form-label">ชื่อโครงงานภาษาไทย<span style="color: red;"> *</span></label>
               <div class="form-floating" id="input_project_nameTH">
-                <textarea class="form-control" name="input_project_nameTH" id="input_project_nameTH" placeholder="เนื้อหากำหนดการ"><?php echo $data['project_nameTH'] ?? ''; ?></textarea>
+                <textarea class="form-control" name="input_project_nameTH" id="input_project_nameTH" placeholder="เนื้อหากำหนดการ" required ><?php echo $data['project_nameTH'] ?? ''; ?></textarea>
                 <!-- <label for="input_project_nameTH">ชื่อโครงงานภาษาไทยของนักศึกษา</label> -->
               </div>
 
-              <label class="form-label">ชื่อโครงงานภาษาอังกฤษ</label>
+              <label class="form-label">ชื่อโครงงานภาษาอังกฤษ<span style="color: red;"> *</span></label>
               <div class="form-floating" id="input_project_nameENG">
-                <textarea class="form-control" name="input_project_nameENG" id="input_project_nameENG" placeholder="เนื้อหากำหนดการ"><?php echo $data['project_nameENG'] ?? ''; ?></textarea>
+                <textarea class="form-control" name="input_project_nameENG" id="input_project_nameENG" placeholder="เนื้อหากำหนดการ" required ><?php echo $data['project_nameENG'] ?? ''; ?></textarea>
                 <!-- <label for="input_project_nameENG">ชื่อโครงงานภาษาอังกฤษของนักศึกษา</label> -->
               </div>
 
 
               <div id="input_student_id1">
-                <label class="form-label">นักศึกษา 1</label>
-                <input type="number" class="form-control" name="input_student_id1" id="input_student_id1" value="<?php echo $data['student_id1']; ?>" placeholder="รหัสรหัสประจำตัวนักศึกษา 1">
+                <label class="form-label">นักศึกษา 1<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="input_student_id1" id="input_student_id1" value="<?php echo $data['student_id1']; ?>" placeholder="รหัสรหัสประจำตัวนักศึกษา 1" required>
               </div>
 
               <div id="input_student_id2">
@@ -244,8 +265,8 @@ if (isset($_POST['update'])) {
               </div>
 
               <div id="input_teacher_id1">
-                <label class="form-label">อาจารย์ที่ปรึกษาหลัก</label>
-                <select id="selectbox" name="input_teacher_id1" class="form-select">
+                <label class="form-label">อาจารย์ที่ปรึกษาหลัก<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_teacher_id1" class="form-select" required>
                   <!-- <option value="">Select Teacher</option> -->
                   <?php
                   $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -286,8 +307,8 @@ if (isset($_POST['update'])) {
               </div>
 
               <div id="input_referee_id">
-                <label class="form-label">ประธานกรรมการ</label>
-                <select id="selectbox" name="input_referee_id" class="form-select">
+                <label class="form-label">ประธานกรรมการ<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_referee_id" class="form-select" required>
                   <!-- <option value="">Select Teacher</option> -->
                   <?php
                   $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -307,8 +328,8 @@ if (isset($_POST['update'])) {
               </div>
 
               <div id="input_referee_id1">
-                <label class="form-label">กรรมการ 1</label>
-                <select id="selectbox" name="input_referee_id1" class="form-select">
+                <label class="form-label">กรรมการ 1<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_referee_id1" class="form-select" required>
                   <!-- <option value="">Select Teacher</option> -->
                   <?php
                   $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -328,8 +349,8 @@ if (isset($_POST['update'])) {
               </div>
 
               <div id="input_referee_id2">
-                <label class="form-label">กรรมการ 2</label>
-                <select id="selectbox" name="input_referee_id2" class="form-select">
+                <label class="form-label">กรรมการ 2<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_referee_id2" class="form-select" required>
                   <!-- <option value="">Select Teacher</option> -->
                   <?php
                   $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -349,8 +370,8 @@ if (isset($_POST['update'])) {
               </div>
 
               <div class="col-md-4">
-                <label class="form-label" for="selectbox">กลุ่มเรียน</label>
-                <select id="selectbox" name="input_group_id" class="form-select">
+                <label class="form-label" for="selectbox">กลุ่มเรียน<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_group_id" class="form-select" required>
                   <option value="<?php echo null ?>">เลือกกลุ่มเรียน</option>
                   <?php
                   $groups = $conn->query("SELECT * FROM `groups` ORDER BY group_id DESC");
@@ -371,21 +392,32 @@ if (isset($_POST['update'])) {
                 <?php if (!empty($data['boundary_path'])) : ?>
                   <input type="hidden" name="existing_boundary_path" value="<?php echo $data['boundary_path']; ?>">
                   <!-- <p class="fw-medium text-danger">ชื่อไฟล์ปัจจุบัน: <?php echo $data['boundary_path']; ?></p> -->
+                  <div class="mt-2">
                   <a href="<?php echo './uploadfileBoundary/' . $data['boundary_path']; ?>" target="_blank"><?php echo $data['boundary_path']; ?></a>
                   <a onclick="return confirm('Are you sure you want to delete File boundary project?');" href="deleteFile_boundary.php?id=<?php echo $data['project_id'] ?>" class="btn btn-danger">Delete File</a>
+                  </div>
                 <?php endif; ?>
               </div>
+              <?php if (empty($data['boundary_path'])) : ?>
+                <div class="loading-overlay mt-2 mb-2" id="form1-loadingOverlay" style="display: none;">
+                  <div class="d-flex align-items-center text-center">
+                    <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                    <div class="spinner-border text-primary ms-3" role="status"></div>
+                  </div>
+                </div>
+              <?php endif; ?>
+
 
 
               <div id="input_year">
-                <label class="form-label">ปีการศึกษา</label>
-                <input type="number" class="form-control" name="input_year" id="input_year" value="<?php echo $data['year']; ?>" placeholder="ปีการศึกษา 25XX">
+                <label class="form-label">ปีการศึกษา<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="input_year" id="input_year" value="<?php echo $data['year']; ?>" placeholder="ปีการศึกษาที่ลงทะเบียน" required>
               </div>
 
 
               <div id="input_term">
-                <label class="form-label">ภาคการศึกษา</label>
-                <select id="selectbox" name="input_term" class="form-select">
+                <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_term" class="form-select" required>
                   <option value="" <?php if (empty($data['term'])) echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -394,9 +426,9 @@ if (isset($_POST['update'])) {
               </div>
 
               <div class="pt-3 justify-content-center">
-              <button type="submit" name="update" id="update" class="btn btn-success">อัปเดต</button>
+                <button type="submit" name="update" id="update" class="btn btn-success">อัปเดต</button>
                 <a type="button" href="./projectmanage.php" class="btn btn-secondary ">กลับ</a>
-                
+
               </div>
 
             </form>
@@ -416,7 +448,21 @@ if (isset($_POST['update'])) {
   </div>
   <!-- End Footer -->
 
-  <script src="../component.js"></script> <!-- component.js -->
+  <script>
+    // animetion uploading    
+    function showLoading(formId) {
+      // แสดง Popup Loading เฉพาะฟอร์มที่ถูกส่ง
+      document.getElementById(formId + "-loadingOverlay").style.display = "block";
+      return true; // ต้อง return true เพื่อให้ฟอร์มส่งข้อมูลไปยัง action
+    }
+
+    function hideLoading(formId) {
+      // ซ่อน Popup Loading เมื่ออัปโหลดสำเร็จ
+      document.getElementById(formId + "-loadingOverlay").style.display = "none";
+    }
+
+
+  </script>
 </body>
 
 </html>

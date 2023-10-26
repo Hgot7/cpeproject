@@ -24,10 +24,11 @@ if (isset($_POST['submit'])) {
   $inputappoint_date = convertToBuddhistEra($_POST['appoint_date']);
   $inputgroup_id = $_POST['group_id'];
 
-  // if (empty($inputappoint_id)) {
-  //   $_SESSION['error'] = 'กรุณากรอก รหัสกำหนดการ';
-  //   header('location: Appointmanage.php');
-  // } else {
+  if (empty($inputtitle)) {
+    $_SESSION['error'] = 'กรุณากรอก หัวข้อกำหนดการ';
+    header('location: Appointmanage.php');
+    exit;
+  } 
     try {
       $inputgroup_id  = empty($inputgroup_id ) ? null : $inputgroup_id ;
       if (!isset($_SESSION['error'])) {

@@ -2,9 +2,21 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['updategroup'])) {
     $group_id = $_POST['id'];
     $group_name = $_POST['group_name'];
+
+    if (empty($group_name)) {
+        $_SESSION['error'] = 'Invalid news ID';
+        header("location: groupmanage.php");
+        exit();
+      }
 
     try {
         if (!isset($_SESSION['error'])) {
@@ -102,7 +114,7 @@ if (isset($_POST['updategroup'])) {
                             ?>
 
                             <input type="hidden" name="id" value="<?php echo $data['group_id']; ?>">
-                            <label class="form-label">กลุ่มเรียน</label>
+                            <label class="form-label">ชื่อกลุ่มเรียน<span style="color: red;"> *</span></label>
                             <input type="text" class="form-control" name="group_name" placeholder="กรุณากรอก ไฟ" required value="<?php echo $data['group_name']; ?>">
                             <div class="pt-3 justify-content-center">
                             <button type="submit" name="updategroup" class="btn btn-success">อัปเดต</button>

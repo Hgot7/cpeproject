@@ -9,36 +9,39 @@ header('content-type: application/json; charset=utf-8');
 
 //ตำแหน่งท่านอาจารย์ 
 function giveTeacherPositionById($Position)
-{
-  switch ($Position) {
-    case "ศาสตราจารย์":
-      return $Position = "ศ.";
-      break;
-    case "ศาสตราจารย์ ดร.":
-      return $Position = "ศ.ดร.";
-      break;
-    case "รองศาสตราจารย์":
-      return $Position = "รศ.";
-      break;
-    case "รองศาสตราจารย์ ดร.":
-      return $Position = "รศ.ดร.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์":
-      return $Position = "ผศ.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์ ดร.":
-      return $Position = "ผศ.ดร.";
-      break;
-    case "อาจารย์":
-      return $Position = "อ.";
-      break;
-    case "ดร.":
-      return $Position = "ดร.";
-      break;
-    default:
-      return $Position = $Position;
-  }
-}
+                      {
+                        switch ($Position) {
+                          case "ศาสตราจารย์":
+                            return $Position = "ศ.";
+                            break;
+                          case "ศาสตราจารย์ ดร.":
+                            return $Position = "ศ.ดร.";
+                            break;
+                          case "รองศาสตราจารย์":
+                            return $Position = "รศ.";
+                            break;
+                          case "รองศาสตราจารย์ ดร.":
+                            return $Position = "รศ.ดร.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์":
+                            return $Position = "ผศ.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์ ดร.":
+                            return $Position = "ผศ.ดร.";
+                            break;
+                          case "อาจารย์":
+                            return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
+                          case "ดร.":
+                            return $Position = "ดร.";
+                            break;
+                          default:
+                            return $Position = $Position;
+                        }
+                      }
 
 if (isset($_POST['signin'])) {
     $username = $_POST['inputusername'];

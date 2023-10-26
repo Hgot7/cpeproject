@@ -18,7 +18,7 @@ if (isset($_GET['delete'])) {
   // รันคำสั่ง SQL
   if ($deletestmt->execute()) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./teachermanage.php");
   }
 }
@@ -69,27 +69,40 @@ if (isset($_GET['delete'])) {
           </div>
           <div class="modal-body">
             <form action="./add_dataTeacher.php" method="post" enctype="multipart/form-data">
-              <!-- <div id="inputteacher_id">
+              <div id="inputteacher_id">
+                <?php
+                $sql = "SELECT teacher_id
+                FROM `teacher`
+                ORDER BY teacher_id DESC
+                LIMIT 1;";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute();
+                $teacher_idMax = $stmt->fetchColumn();
+                if(empty($teacher_idMax)){
+                  $teacher_idMax = 1;
+                }
+                $teacher_idMax++;
+                ?>
                 <label class="form-label">รหัสประจำตัวอาจารย์</label>
-                <input type="text" class="form-control" name="inputteacher_id" id="inputteacher_id" value="<?php if (isset($_POST['inputteacher_id'])) {
-                                                                                                              echo $_POST['inputteacher_id'];
-                                                                                                            } ?>" placeholder="รหัสประจำตัวอาจารย์">
-              </div> -->
+                <input type="text" class="form-control" name="inputteacher_id" id="inputteacher_id" value="<?php 
+                                                                                                              echo $teacher_idMax;
+                                                                                                             ?>" placeholder="รหัสประจำตัวอาจารย์" readonly>
+              </div>
 
               <div id="inputteacher_username">
-                <label class="form-label">ชื่อผู้ใช้งานระบบ</label>
-                <input type="text" class="form-control" name="inputteacher_username" id="inputteacher_username" value="<?php echo isset($_POST['inputteacher_username']) ?  $_POST['inputteacher_username'] : '' ?>" placeholder="ชื่อผู้ใช้งานระบบ">
+                <label class="form-label">ชื่อผู้ใช้งานระบบ<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputteacher_username" id="inputteacher_username" value="<?php echo isset($_POST['inputteacher_username']) ?  $_POST['inputteacher_username'] : '' ?>" placeholder="ชื่อผู้ใช้งานระบบ" required>
               </div>
 
               <div id="inputteacher_password">
-                <label class="form-label">รหัสผ่าน</label>
-                <input type="text" class="form-control" name="inputteacher_password" id="inputteacher_password" value="<?php echo isset($_POST['inputteacher_password']) ?  $_POST['inputteacher_password'] : '' ?>" placeholder="รหัสผ่าน">
+                <label class="form-label">รหัสผ่าน<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputteacher_password" id="inputteacher_password" value="<?php echo isset($_POST['inputteacher_password']) ?  $_POST['inputteacher_password'] : '' ?>" placeholder="รหัสผ่าน" required>
               </div>
 
 
               <div id="inputposition">
-                <label class="form-label">ตำแหน่งทางวิชาการ</label>
-                <input type="text" id="inputposition" name="inputposition" class="form-control" list="position_options" placeholder="ตำแหน่งทางวิชาการ">
+                <label class="form-label">ตำแหน่งทางวิชาการ<span style="color: red;"> *</span></label>
+                <input type="text" id="inputposition" name="inputposition" class="form-control" list="position_options" placeholder="ตำแหน่งทางวิชาการ" required>
                 <datalist id="position_options">
                   <option value="ศาสตราจารย์"></option>
                   <option value="ศาสตราจารย์ ดร."></option>
@@ -97,35 +110,36 @@ if (isset($_GET['delete'])) {
                   <option value="รองศาสตราจารย์ ดร."></option>
                   <option value="ผู้ช่วยศาสตราจารย์"></option>
                   <option value="ผู้ช่วยศาสตราจารย์ ดร."></option>
-                  <option value="ดร."></option>
+                  <option value="อาจารย์ ดร."></option>
                   <option value="อาจารย์"></option>
+                  <option value="ดร."></option>
                 </datalist>
               </div>
 
 
               <div id="inputfirstname">
-                <label class="form-label">ชื่อ</label>
-                <input type="text" class="form-control" name="inputfirstname" id="inputfirstname" placeholder="firstname">
+                <label class="form-label">ชื่อ<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputfirstname" id="inputfirstname" placeholder="ชื่อ" required>
               </div>
 
               <div id="inputlastname">
-                <label class="form-label">นามสกุล</label>
-                <input type="text" class="form-control" name="inputlastname" id="inputlastname" placeholder="lastname">
+                <label class="form-label">นามสกุล<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputlastname" id="inputlastname" placeholder="นามสกุล" required>
               </div>
 
               <div id="email">
-                <label class="form-label">อีเมล</label>
-                <input type="text" class="form-control" name="inputemail" id="inputemail" placeholder="@mail.rmutt.ac.th">
+                <label class="form-label">อีเมล<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputemail" id="inputemail" placeholder="@en.rmutt.ac.th" required>
               </div>
 
               <div id="inputphone">
                 <label class="form-label">เบอร์โทรศัพท์</label>
-                <input type="text" class="form-control" name="inputphone" id="inputphone" placeholder="092xxxxxxx">
+                <input type="text" class="form-control" name="inputphone" id="inputphone" placeholder="เบอร์โทรศัพท์ไม่เอา( - )">
               </div>
 
               <div id="inputlevel_id">
-                <label class="form-label">สิทธิ์ผู้ใช้งาน</label>
-                <select name="inputlevel_id" class="form-select">
+                <label class="form-label">สิทธิ์ผู้ใช้งาน<span style="color: red;"> *</span></label>
+                <select name="inputlevel_id" class="form-select" required>
                   <option value="0">ผู้ดูแลระบบ</option>
                   <option value="1">อาจารย์</option>
 
@@ -250,8 +264,8 @@ if (isset($_GET['delete'])) {
                                 } ?>
                             </td>
                             <td>
-                              <a href="editTeacher.php?id=<?php echo $user['teacher_id']; ?>" class="btn btn-warning">Edit</a>
-                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $user['teacher_id']; ?>" class="btn btn-danger">Delete</a>
+                              <a href="editTeacher.php?id=<?php echo $user['teacher_id']; ?>" class="btn btn-warning mb-1">Edit</a>
+                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $user['teacher_id']; ?>" class="btn btn-danger mb-1">Delete</a>
                             </td>
                           </tr>
                         <?php }
@@ -282,8 +296,8 @@ if (isset($_GET['delete'])) {
                                 } ?>
                             </td>
                             <td>
-                              <a href="editTeacher.php?id=<?php echo $user['teacher_id']; ?>" class="btn btn-warning">Edit</a>
-                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $user['teacher_id']; ?>" class="btn btn-danger">Delete</a>
+                              <a href="editTeacher.php?id=<?php echo $user['teacher_id']; ?>" class="btn btn-warning mb-1">Edit</a>
+                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $user['teacher_id']; ?>" class="btn btn-danger mb-1">Delete</a>
                             </td>
                           </tr>
                         <?php }

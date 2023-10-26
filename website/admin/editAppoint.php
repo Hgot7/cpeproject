@@ -1,6 +1,11 @@
 <?php
 session_start();
 require_once "../connect.php";
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
 function convertToBuddhistEra($datetime)
 {
     $date = date('Y-m-d', strtotime($datetime));
@@ -139,8 +144,8 @@ if (isset($_POST['update'])) {
                             </div> -->
 
                             <div id="title">
-                                <label class="form-label">หัวข้อกำหนดการ</label>
-                                <input type="text" class="form-control" name="title" id="title" value="<?php echo isset($data['title']) ? $data['title'] : ''; ?>" placeholder="student_pass">
+                                <label class="form-label">หัวข้อกำหนดการ<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="title" id="title" value="<?php echo isset($data['title']) ? $data['title'] : ''; ?>" placeholder="หัวข้อกำหนดการ" required>
                             </div>
 
                             <label class="form-label">เนื้อหากำหนดการ</label>
@@ -150,13 +155,13 @@ if (isset($_POST['update'])) {
                             </div>
 
                             <div id="title">
-                                <label class="form-label">วันเวลาที่สิ้นสุดกำหนดการ</label>
-                                <input type="datetime-local" class="form-control" name="appoint_date" id="appoint_date" value="<?php echo isset($data['appoint_date']) ? $data['appoint_date'] : ''; ?>" placeholder="หัวข้อกำหนดการ">
+                                <label class="form-label">วันเวลาที่สิ้นสุดกำหนดการ<span style="color: red;"> *</span></label>
+                                <input type="datetime-local" class="form-control" name="appoint_date" id="appoint_date" value="<?php echo isset($data['appoint_date']) ? $data['appoint_date'] : ''; ?>" placeholder="หัวข้อกำหนดการ" required>
                             </div>
 
 
                             <div class="col-md-4" id="group_id">
-                                <label class="form-label">กลุ่มเรียน</label>
+                                <label class="form-label">กลุ่มเรียน<span style="color: red;"> *</span></label>
                                 <select id="selectbox" name="group_id" class="form-select">
                                     <?php
                                     $columnValue = null;

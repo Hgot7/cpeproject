@@ -9,7 +9,7 @@ if (isset($_POST['submitgroup'])) {
   // $inputurole = $_POST['inputurole'];
 
   if(empty($inputgroup_name)){
-    $_SESSION['error'] = 'กรุณากรอกกลุ่มเรียน';
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
     header('Location: ./groupmanage.php');
 
  

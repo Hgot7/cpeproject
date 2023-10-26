@@ -30,13 +30,23 @@ if (isset($_GET['id']) && isset($_POST['file_chapter'])) {
       $stmt->execute();
       $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
 
+      // ตรวจสอบว่ามีไฟล์ที่มีชื่อเดียวกันอยู่แล้ว
       if ($existingFile) {
-        $_SESSION['error'] = 'ชื่อไฟล์ซ้ำกันในระบบ ไม่สามารถอัปโหลดได้';
-        header("location: ./Stduploadfile.php?id=" . $id);
-        exit;
-      } elseif (move_uploaded_file($_FILES["file_path"]["tmp_name"], $targetFile)) {
+        $filename = pathinfo($file_path, PATHINFO_FILENAME); // ดึงชื่อไฟล์แต่ไม่รวมนามสกุล
+        $file_extension = pathinfo($file_path, PATHINFO_EXTENSION); // ดึงนามสกุลไฟล์
+
+        $counter = 1;
+        while (file_exists($targetFile)) {
+          // เพิ่มเลขต่อท้ายชื่อไฟล์
+          $file_path = $filename . '_' . $counter . '.' . $file_extension;
+          $targetFile = $targetDir . $file_path;
+          $counter++;
+        }
+      }
+      if (move_uploaded_file($_FILES["file_path"]["tmp_name"], $targetFile)) {
         // เพิ่มข้อมูลลงในฐานข้อมูล
         echo "<script>hideLoading();</script>"; // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
+
         try {
           $file_status = "0";
           $stmt = $conn->prepare("INSERT INTO `file` (file_date, file_path, file_status, file_chapter, project_id) 
@@ -117,6 +127,7 @@ if (isset($_GET['id']) && isset($_POST['file_chapter'])) {
               $stmt->execute();
               $teacherdata = $stmt->fetch(PDO::FETCH_ASSOC);
 
+              if(empty($teacherdata['email'])){continue;}
               $to = $teacherdata['email'];
               $subject = "นักศึกษาอัปโหลดไฟล์ $file_chapter รหัสโครงงาน: " . $project_id['project_id'];
               $message = "<html><body>";
@@ -134,7 +145,7 @@ if (isset($_GET['id']) && isset($_POST['file_chapter'])) {
               if (mail($to, $subject, $message, $headers)) {
                 $_SESSION['success'] = "เพิ่มข้อมูลเสร็จสมบูรณ์";
               } else {
-                $_SESSION['error'] = "มีปัญหาในการแสดงความคิดเห็น";
+                $_SESSION['error'] = "มีปัญหาในการแจ้งเตือน";
               }
             }
 

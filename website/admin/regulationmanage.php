@@ -2,10 +2,17 @@
 session_start();
 require_once "../connect.php";
 
-// if (!isset($_SESSION['admin_login'])) {
-//   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
-//   header('Location: ../index.php');
-// }
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
+if(isset($_SESSION['selectedYear'])){
+  unset($_SESSION['selectedYear']);
+}
+if(isset($_SESSION['selectedTerm'])){
+  unset($_SESSION['selectedTerm']);
+}
 
 //                                   delete data
 if (isset($_GET['delete'])) {
@@ -45,7 +52,7 @@ if (isset($_GET['delete'])) {
   // รันคำสั่ง SQL
   if ($deletestmt->execute()) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./regulationmanage.php");
     exit;
   }
@@ -116,18 +123,18 @@ if (isset($_GET['delete'])) {
               </div>
 
               <div id="inputnew_text">
-                <label class="form-label">กฎข้อบังคับในรายวิชา</label>
-                <input type="text" id="inputregulation_text" name="inputregulation_text" class="form-control" placeholder="กฎข้อบังคับของรายวิชา">
+                <label class="form-label">กฎข้อบังคับในรายวิชา<span style="color: red;"> *</span></label>
+                <input type="text" id="inputregulation_text" name="inputregulation_text" class="form-control" placeholder="กฎข้อบังคับของรายวิชา" required>
               </div>
 
               <div id="year">
-                <label class="form-label">ปีการศึกษาที่ใช้งาน</label>
-                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="25xx">
+                <label class="form-label">ปีการศึกษาที่ใช้งาน<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษาที่ใช้งาน" required>
               </div>
 
               <div id="term">
-                <label class="form-label">ภาคการศึกษาที่ใช้งาน</label>
-                <select name="inputterm" class="form-select">
+                <label class="form-label">ภาคการศึกษาที่ใช้งาน<span style="color: red;"> *</span></label>
+                <select name="inputterm" class="form-select" required>
                   <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -187,16 +194,33 @@ if (isset($_GET['delete'])) {
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                       if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+
+                      }
                       $years = $conn->query("SELECT DISTINCT year FROM `regulation` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                          $yearValue = $datayear['year'];
+                          $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                            <?php echo $yearValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -206,20 +230,28 @@ if (isset($_GET['delete'])) {
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `regulation` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
                   </div>
+
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                      <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
+                    </div>
                 </div>
               </form>
 
@@ -256,8 +288,8 @@ if (isset($_GET['delete'])) {
                   <tbody>
                     <?php
                     if (isset($_POST['submitfilter'])) {
-                      $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                      $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                      // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                      // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
 
                       if (empty($selectedYear) && empty($selectedTerm)) {
                         $stmt = $conn->query("SELECT * FROM `regulation` ORDER BY year DESC , term DESC");

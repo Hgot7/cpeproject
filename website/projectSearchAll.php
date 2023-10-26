@@ -8,6 +8,17 @@ if (!isset($_SESSION['teacher_login']) && !isset($_SESSION['student_login'])) {
   exit();
 }
 
+if(isset($_SESSION['selectedYear'])){
+  unset($_SESSION['selectedYear']);
+}
+if(isset($_SESSION['selectedTerm'])){
+  unset($_SESSION['selectedTerm']);
+}
+if(isset($_SESSION['selectedGroup'])){
+  unset($_SESSION['selectedGroup']);
+}
+
+
 if (isset($_GET['delete'])) {
   $delete_id = $_GET['delete'];
 
@@ -52,6 +63,7 @@ if (isset($_GET['delete'])) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -86,209 +98,209 @@ if (isset($_GET['delete'])) {
     <div class="row">
       <?php if (isset($_SESSION['student_login'])) { ?>
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow-lg ">
-  <div class="position-sticky">
-    <ul class="nav flex-column">
+          <div class="position-sticky">
+            <ul class="nav flex-column">
 
-      <li class="nav-item pb-2">
-        <a href="#" class="nav-link text-primary disabled" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-person-workspace h3"></i>
-            </div>
-            <span class="ps-2 fs-5 fw-bold"><?php echo $_SESSION['student_login']; ?></span>
+              <li class="nav-item pb-2">
+                <a href="#" class="nav-link text-primary disabled" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-person-workspace h3"></i>
+                    </div>
+                    <span class="ps-2 fs-5 fw-bold"><?php echo $_SESSION['student_login']; ?></span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <hr class="sidebar-divider my-0">
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./student/Stdpage.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-house-door h4"></i>
+                    </div>
+                    <span class="ps-2">หน้าหลัก</span></span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./student/profileStd.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-person-lines-fill h4"></i>
+                    </div>
+                    <span class="ps-2">โปรไฟล์ของนักศึกษา</span></span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./student/Stduploadfile.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-file-earmark-arrow-up h4"></i>
+                    </div>
+                    <span class="ps-2">อัปโหลดไฟล์</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./student/DownloadDocument.php" id="upload" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-file-earmark-arrow-down h4"></i>
+                    </div>
+                    <span class="ps-2">ดาวน์โหลดไฟล์เอกสาร</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./student/statusproject.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-card-checklist h4"></i>
+                    </div>
+                    <span class="ps-2">สถานะโครงงาน</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="../projectSearchAll.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-search h4"></i>
+                    </div>
+                    <span class="ps-2">ค้นหาข้อมูลโครงงาน</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./logout_Std.php" id="logout" class="nav-link active">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-box-arrow-right h4"></i>
+                    </div>
+                    <span class="ps-2">ออกจากระบบ</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
           </div>
-        </a>
-      </li>
 
-      <li class="nav-item pb-2">
-        <hr class="sidebar-divider my-0">
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./student/Stdpage.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-house-door h4"></i>
-            </div>
-            <span class="ps-2">หน้าหลัก</span></span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./student/profileStd.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-person-lines-fill h4"></i>
-            </div>
-            <span class="ps-2">โปรไฟล์ของนักศึกษา</span></span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./student/Stduploadfile.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-file-earmark-arrow-up h4"></i>
-            </div>
-            <span class="ps-2">อัปโหลดไฟล์</span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./student/DownloadDocument.php" id="upload" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-file-earmark-arrow-down h4"></i>
-            </div>
-            <span class="ps-2">ดาวน์โหลดไฟล์เอกสาร</span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./student/statusproject.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-card-checklist h4"></i>
-            </div>
-            <span class="ps-2">สถานะโครงงาน</span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="../projectSearchAll.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-search h4"></i>
-            </div>
-            <span class="ps-2">ค้นหาข้อมูลโครงงาน</span>
-          </div>
-        </a>
-      </li>
-
-      <li class="nav-item pb-2">
-        <a href="./logout_Std.php" id="logout" class="nav-link active">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-box-arrow-right h4"></i>
-            </div>
-            <span class="ps-2">ออกจากระบบ</span>
-          </div>
-        </a>
-      </li>
-    </ul>
-  </div>
-
-</nav>
+        </nav>
       <?php } elseif (isset($_SESSION['teacher_login'])) { ?>
 
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse shadow-lg ">
-    <div class="position-sticky">
-      <ul class="nav flex-column">
-        <a href="#" class="nav-link text-primary disabled" aria-current="page">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow">
-                <i class="bi bi-person-workspace h3"></i>
-              </div>
-              <span class="ps-2 fs-5 fw-bold"><?php echo $_SESSION['teacher_login'];?></span>
-            </div>
-          </a>
-         
-        </li>
-       
-        <li class="nav-item pb-2">
-        <hr class="sidebar-divider my-0">
-    </li>
+          <div class="position-sticky">
+            <ul class="nav flex-column">
+              <a href="#" class="nav-link text-primary disabled" aria-current="page">
+                <div class="d-flex align-items-center">
+                  <div class="flex-grow">
+                    <i class="bi bi-person-workspace h3"></i>
+                  </div>
+                  <span class="ps-2 fs-5 fw-bold"><?php echo $_SESSION['teacher_login']; ?></span>
+                </div>
+              </a>
 
-        <li class="nav-item pb-2">
-          <a href="./teacher/Teacherpage.php" class="nav-link active" aria-current="page">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow">
-                <i class="bi bi-house-door h4"></i>
-              </div>
-              <span class="ps-2">หน้าหลัก</span>
-            </div>
-          </a>
-        </li>
+              </li>
 
-        <li class="nav-item pb-2">
-        <a href="./teacher/profileTeacher.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-person-lines-fill h4"></i>
-            </div>
-            <span class="ps-2">โปรไฟล์ของอาจารย์</span></span>
+              <li class="nav-item pb-2">
+                <hr class="sidebar-divider my-0">
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./teacher/Teacherpage.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-house-door h4"></i>
+                    </div>
+                    <span class="ps-2">หน้าหลัก</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./teacher/profileTeacher.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-person-lines-fill h4"></i>
+                    </div>
+                    <span class="ps-2">โปรไฟล์ของอาจารย์</span></span>
+                  </div>
+                </a>
+              </li>
+
+
+              <li class="nav-item pb-2">
+                <a href="./teacher/DownloadDocument.php" id="upload" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-file-earmark-text h4"></i>
+                    </div>
+                    <span class="ps-2">เอกสารในรายวิชา</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./teacher/Teacheryourproject.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-clipboard h4"></i>
+                    </div>
+                    <span class="ps-2">โครงงานที่รับเป็นที่ปรึกษา</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./teacher/viewpointTest.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-clipboard2-check h4"></i>
+                    </div>
+                    <span class="ps-2">ประเมินโครงงาน</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="../projectSearchAll.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-search h4"></i>
+                    </div>
+                    <span class="ps-2">ค้นหาข้อมูลโครงงาน</span>
+                  </div>
+                </a>
+              </li>
+
+              <li class="nav-item pb-2">
+                <a href="./logout_Teacher.php" class="nav-link active" aria-current="page">
+                  <div class="d-flex align-items-center">
+                    <div class="flex-grow">
+                      <i class="bi bi-box-arrow-right h4"></i>
+                    </div>
+                    <span class="ps-2">ออกจากระบบ</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
           </div>
-        </a>
-      </li>
 
-        
-        <li class="nav-item pb-2">
-        <a href="./teacher/DownloadDocument.php" id="upload" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-file-earmark-text h4"></i>
-            </div>
-            <span class="ps-2">เอกสารในรายวิชา</span>
-          </div>
-        </a>
-      </li>
-
-        <li class="nav-item pb-2">
-          <a href="./teacher/Teacheryourproject.php" class="nav-link active" aria-current="page">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow">
-                <i class="bi bi-clipboard h4"></i>
-              </div>
-              <span class="ps-2">โครงงานที่รับเป็นที่ปรึกษา</span>
-            </div>
-          </a>
-        </li>
-
-        <li class="nav-item pb-2">
-          <a href="./teacher/viewpointTest.php" class="nav-link active" aria-current="page">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow">
-                <i class="bi bi-clipboard2-check h4"></i>
-              </div>
-              <span class="ps-2">ประเมินโครงงาน</span>
-            </div>
-          </a>
-        </li>
-
-        <li class="nav-item pb-2">
-        <a href="../projectSearchAll.php" class="nav-link active" aria-current="page">
-          <div class="d-flex align-items-center">
-            <div class="flex-grow">
-              <i class="bi bi-search h4"></i>
-            </div>
-            <span class="ps-2">ค้นหาข้อมูลโครงงาน</span>
-          </div>
-        </a>
-      </li>
-
-        <li class="nav-item pb-2">
-          <a href="./logout_Teacher.php" class="nav-link active" aria-current="page">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow">
-                <i class="bi bi-box-arrow-right h4"></i>
-              </div>
-              <span class="ps-2">ออกจากระบบ</span>
-            </div>
-          </a>
-        </li>
-      </ul>
-    </div>
-
-  </nav>
+        </nav>
       <?php } ?>
       <main class="col-md-9 ml-sm-auto col-lg-10 px-md-3 py-3">
-      <div class="row">
-      
+        <div class="row">
+
           <h1 class="h2" style="font-family: 'IBM Plex Sans Thai', sans-serif;">ข้อมูลโครงงานในรายวิชา</h1>
           <?php if (isset($_SESSION['student_login'])) { ?>
             <nav aria-label="breadcrumb">
@@ -330,28 +342,34 @@ if (isset($_GET['delete'])) {
                       <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                       <select class="form-select" name="filteryear">
                         <?php
-                            if (isset($_POST['submitfilter'])) {
-                              $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                              $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
-                              $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
-                              $selectedYear =  $_SESSION['selectedYear'];
-                              $selectedTerm =   $_SESSION['selectedTerm'];
-                             $selectedGroup = $_SESSION['selectedGroup'];
-                            }
+                        if(isset($_POST['resetfilter'])){
+                          unset($_SESSION['selectedYear']);
+                          unset($_SESSION['selectedTerm']);
+                          unset($_SESSION['selectedGroup']);
+                        }
+                        if (isset($_POST['submitfilter'])) {
+                          $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                          $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                          $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                          $selectedYear =  $_SESSION['selectedYear'];
+                          $selectedTerm =   $_SESSION['selectedTerm'];
+                          $selectedGroup = $_SESSION['selectedGroup'];
+                        }
                         $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                         $years->execute();
+                        $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                         ?>
                         <option value="">เลือกปีการศึกษา</option>
                         <?php
                         while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
                           $yearValue = $datayear['year'];
                           $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
-                          ?>
+                        ?>
                           <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
-                              <?php echo $yearValue; ?>
+                            <?php echo $yearValue; ?>
                           </option>
-                      <?php } ?>
-                      
+                        <?php } ?>
+
                       </select>
                     </div>
 
@@ -361,12 +379,17 @@ if (isset($_GET['delete'])) {
                         <?php
                         $terms = $conn->query("SELECT DISTINCT term FROM `project` ORDER BY term DESC");
                         $terms->execute();
+                        $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
+
                         ?>
                         <option value="">เลือกภาคการศึกษา</option>
                         <?php
-                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                          <option value="<?php echo $dataterm['term']; ?>">
-                            <?php echo $dataterm['term']; ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
                           </option>
                         <?php } ?>
                       </select>
@@ -384,12 +407,17 @@ if (isset($_GET['delete'])) {
                          ORDER BY groups.group_name DESC");
 
                         $groups->execute();
+                        $selectedGroup = isset($_SESSION['selectedGroup']) ? $_SESSION['selectedGroup'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
+
                         ?>
                         <option value="">เลือกกลุ่มเรียน</option>
                         <?php
-                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) { ?>
-                          <option value="<?php echo $datagroup['group_name']; ?>">
-                            <?php echo $datagroup['group_name']; ?>
+                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) {
+                          $groupValue = $datagroup['group_name'];
+                          $isGroupSelected = ($selectedGroup == $groupValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $groupValue; ?>" <?php echo $isGroupSelected; ?>>
+                            <?php echo $groupValue; ?>
                           </option>
                         <?php } ?>
                       </select>
@@ -398,6 +426,10 @@ if (isset($_GET['delete'])) {
 
                     <div class="col-auto d-flex align-items-end justify-content-start">
                       <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                    </div>
+
+                    <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                     </div>
 
 
@@ -425,7 +457,7 @@ if (isset($_GET['delete'])) {
                   <table class="table">
                     <thead>
                       <tr>
-                      <th scope="col" style="width: 5em;">ลำดับที่</th>
+                        <th scope="col" style="width: 5em;">ลำดับที่</th>
                         <th scope="col">รหัสกลุ่มโครงงาน</th>
                         <th scope="col">ชื่อโครงงานภาษาไทย</th>
                         <th scope="col">ชื่อโครงงานภาษาอังกฤษ</th>
@@ -498,6 +530,9 @@ if (isset($_GET['delete'])) {
                           case "อาจารย์":
                             return $Position = "อ.";
                             break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
                           case "ดร.":
                             return $Position = "ดร.";
                             break;
@@ -529,7 +564,6 @@ if (isset($_GET['delete'])) {
                         // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
                         // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
                         // $selectedGroup = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
-                    
 
                         if (empty($selectedYear) && empty($selectedTerm) && empty($selectedGroup)) {
                           $sql = "SELECT * FROM `project`";
@@ -559,6 +593,34 @@ if (isset($_GET['delete'])) {
                           $stmt = $conn->prepare($sql);
                           $stmt->bindParam(':year', $selectedYear);
                           $stmt->bindParam(':term', $selectedTerm);
+                          $stmt->execute();
+                          $filteredData = $stmt->fetchAll();
+                          
+                        } elseif (!empty($selectedYear) && empty($selectedTerm) && !empty($selectedGroup)) {
+                          // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
+                          $sql = "SELECT project.*
+                          FROM `project`
+                          LEFT JOIN `groups` ON project.group_id = groups.group_id
+                          WHERE year LIKE :year
+                          AND (groups.group_name LIKE :group_name AND :group_name <> '')";
+                          $stmt = $conn->prepare($sql);
+                          $stmt->bindParam(':year', $selectedYear);
+                          $stmt->bindParam(':group_name', $selectedGroup);
+
+                          $stmt->execute();
+                          $filteredData = $stmt->fetchAll();
+                        } elseif (!empty($selectedYear) && !empty($selectedTerm) && !empty($selectedGroup)) {
+                          // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
+                          $sql = "SELECT project.*
+                          FROM `project`
+                          LEFT JOIN `groups` ON project.group_id = groups.group_id
+                          WHERE year LIKE :year
+                          AND term LIKE :term
+                          AND (groups.group_name LIKE :group_name AND :group_name <> '')";
+                          $stmt = $conn->prepare($sql);
+                          $stmt->bindParam(':year', $selectedYear);
+                          $stmt->bindParam(':term', $selectedTerm);
+                          $stmt->bindParam(':group_name', $selectedGroup);
 
                           $stmt->execute();
                           $filteredData = $stmt->fetchAll();
@@ -579,6 +641,9 @@ if (isset($_GET['delete'])) {
                           $filteredData = $stmt->fetchAll();
                         }
                         $index = 1;
+                        if (!$filteredData) {
+                          echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
+                        } else {
                         foreach ($filteredData as $project) {
                           //นักศึกษา 1
                           $student1 = giveStudentById($conn, $project['student_id1']);
@@ -622,8 +687,8 @@ if (isset($_GET['delete'])) {
                             <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
                             <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                            <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                            <!-- <td><a href="<?php echo './uploadfileDocument/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
+                            <td><a href="<?php echo './admin/uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                            <!-- <td><a href="<?php echo './student/./uploadfileBoundary/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
                             <td><a href="<?php echo './student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
                             <td><a href="<?php echo './student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
@@ -631,7 +696,8 @@ if (isset($_GET['delete'])) {
                             <td><?php echo $project['term']; ?></td>
 
                           </tr>
-                        <?php }
+                          <?php }
+                        }
                       } elseif (isset($_POST['submitsearch'])) {
                         $SearchText = $_POST['search'];
                         $isStudent = strpos($SearchText, '(นักศึกษา)') !== false;
@@ -728,58 +794,58 @@ if (isset($_GET['delete'])) {
                         if (!$projects) {
                           echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
                         } else {
-                        foreach ($projects as $project) {
-                          //นักศึกษา 1
-                          $student1 = giveStudentById($conn, $project['student_id1']);
-                          //นักศึกษา 2
-                          $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
-                          //นักศึกษา 3
-                          $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
-                          //อาจารย์ที่ปรึกษาหลัก
-                          $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
-                          //อาจารย์ที่ปรึกษาร่วม
-                          $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
-                          //ประธานกรรมการ
-                          $referee_id = giveTeacherById($conn, $project['referee_id']);
-                          //กรรมการ 1
-                          $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
-                          //กรรมการ 2
-                          $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
-                          //เอกสารโปสเตอร์
-                          $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
-                          //เอกสารรูปเล่มฉบับเต็ม
-                          $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
-                          //กลุ่มเรียน
-                          $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
-                        ?>
-                          <tr>
-                            <th scope="row"><?php echo $index++; ?></th>
-                            <th scope="row"><?php echo $project['project_id']; ?></th>
-                            <td><?php echo $project['project_nameTH']; ?></td>
-                            <td><?php echo $project['project_nameENG']; ?></td>
-                            <td><?php echo $student1['firstname']; ?></td>
-                            <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
-                            <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
-                            <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
-                            <td><?php if (empty($teacher2)) {
-                                  echo "";
-                                } else {
-                                  echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
-                                } ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
-                            <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
+                          foreach ($projects as $project) {
+                            //นักศึกษา 1
+                            $student1 = giveStudentById($conn, $project['student_id1']);
+                            //นักศึกษา 2
+                            $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
+                            //นักศึกษา 3
+                            $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
+                            //อาจารย์ที่ปรึกษาหลัก
+                            $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
+                            //อาจารย์ที่ปรึกษาร่วม
+                            $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
+                            //ประธานกรรมการ
+                            $referee_id = giveTeacherById($conn, $project['referee_id']);
+                            //กรรมการ 1
+                            $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
+                            //กรรมการ 2
+                            $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
+                            //เอกสารโปสเตอร์
+                            $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
+                            //เอกสารรูปเล่มฉบับเต็ม
+                            $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
+                            //กลุ่มเรียน
+                            $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
+                          ?>
+                            <tr>
+                              <th scope="row"><?php echo $index++; ?></th>
+                              <th scope="row"><?php echo $project['project_id']; ?></th>
+                              <td><?php echo $project['project_nameTH']; ?></td>
+                              <td><?php echo $project['project_nameENG']; ?></td>
+                              <td><?php echo $student1['firstname']; ?></td>
+                              <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
+                              <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
+                              <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
+                              <td><?php if (empty($teacher2)) {
+                                    echo "";
+                                  } else {
+                                    echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
+                                  } ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
+                              <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                            <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                            <!-- <td><a href="<?php echo './uploadfileDocument/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
-                            <td><a href="<?php echo './student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
-                            <td><a href="<?php echo './student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
+                              <td><a href="<?php echo './admin/uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                              <!-- <td><a href="<?php echo './uploadfileBoundary/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
+                              <td><a href="<?php echo './student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
+                              <td><a href="<?php echo './student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
-                            <td><?php echo $project['year']; ?></td>
-                            <td><?php echo $project['term']; ?></td>
+                              <td><?php echo $project['year']; ?></td>
+                              <td><?php echo $project['term']; ?></td>
 
-                          </tr>
+                            </tr>
                           <?php }
                         }
                       } elseif (isset($_POST['viewAll'])) {
@@ -834,8 +900,8 @@ if (isset($_GET['delete'])) {
                               <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
                               <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                              <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                              <!-- <td><a href="<?php echo './uploadfileDocument/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
+                              <td><a href="<?php echo './admin/uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                              <!-- <td><a href="<?php echo './uploadfileBoundary/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
                               <td><a href="<?php echo './student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
                               <td><a href="<?php echo './student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
@@ -896,8 +962,8 @@ if (isset($_GET['delete'])) {
                               <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
                               <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                              <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                              <!-- <td><a href="<?php echo './uploadfileDocument/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
+                              <td><a href="<?php echo './admin/uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                              <!-- <td><a href="<?php echo './uploadfileBoundary/' . $document['document_path']; ?>" target="_blank"><?php echo $document['document_path']; ?></a></td> -->
                               <td><a href="<?php echo './student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
                               <td><a href="<?php echo './student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
@@ -923,7 +989,7 @@ if (isset($_GET['delete'])) {
               </div>
             </div>
           </div>
-      </div>
+        </div>
       </main>
 
     </div>

@@ -71,7 +71,7 @@ try {
                         $column16 = !empty($data[34]) ? $data[34] : null;
 
 
-                       
+
                         $phoneAll = array();
                         $phoneAll[0] = $column14;
                         $phoneAll[1] = $column15;
@@ -90,6 +90,26 @@ try {
                             // echo "<br>2 or 5 continue<br>";
                             continue;
                         }
+
+                        
+                        foreach ($studentIdAll as $student_id) {
+                            if (empty($student_id)) {
+                                continue;
+                            }
+                            $stmt = $conn->prepare("SELECT * FROM `project` WHERE student_id1 = :student_id or student_id2 = :student_id or student_id3 = :student_id");
+                            $stmt->bindParam(':student_id', $student_id);
+                            $stmt->execute();
+                            $project_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                            if (!empty($project_data)) {
+                                $i = 1;
+                                break;
+                            }
+                        }
+                        if($i == 1){
+                            $i = 0;
+                            continue;
+                        }
                         //check ไฟล์ที่ซ้ำกัน จาก primary key             
                         $checkSql = "SELECT COUNT(*) FROM `project` WHERE project_id = $column1";
                         $checkStmt = $conn->prepare($checkSql);
@@ -101,22 +121,21 @@ try {
                             header("Location: ../uploadCSV.php");
                             exit();
                         }
-                        
+
                         foreach ($studentIdAll as $index => $studentID) {
                             $phone = $phoneAll[$index];
                             // ทำสิ่งที่คุณต้องการกับ $student และ $phone ในแต่ละลำดับ
-                            if(!empty($studentID)){
-                            $add_phone = $conn->prepare("UPDATE `student` SET phone = :phone WHERE student_id = :student_id");
-                            $add_phone->bindParam(':phone', $phone);
-                            $add_phone->bindParam(':student_id', $studentID);
-                            $add_phone->execute();
-                            // if ($add_phone->execute()) {
-                            //     echo ' รหัสนักศึกษา'.$studentID .'เบอร์โทร'.$phone ."สำเร็จ ";
-                            // } else {
-                            //     echo "เกิดข้อผิดพลาดในการ execute คำสั่ง SQL";
-                            // }
-                        }
-                           
+                            if (!empty($studentID)) {
+                                $add_phone = $conn->prepare("UPDATE `student` SET phone = :phone WHERE student_id = :student_id");
+                                $add_phone->bindParam(':phone', $phone);
+                                $add_phone->bindParam(':student_id', $studentID);
+                                $add_phone->execute();
+                                // if ($add_phone->execute()) {
+                                //     echo ' รหัสนักศึกษา'.$studentID .'เบอร์โทร'.$phone ."สำเร็จ ";
+                                // } else {
+                                //     echo "เกิดข้อผิดพลาดในการ execute คำสั่ง SQL";
+                                // }
+                            }
                         }
                         // เตรียมคำสั่ง SQL
                         if (empty($data[9])) {
@@ -163,6 +182,7 @@ try {
                 // ลบไฟล์ CSV หลังจากเสร็จสิ้นการอัปโหลด
                 unlink($targetFile);
                 $_SESSION['success'] = 'บันทึกข้อมูลโปรเจคสำเร็จ';
+                echo "<script>hideLoading();</script>"; // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
                 header("Location: ../uploadCSV.php");
                 exit();
             }

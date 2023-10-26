@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $topic_section = $_POST['topic_section'];
@@ -156,12 +162,12 @@ function giveTopic_section_weight($conn)
                             <input type="hidden" name="id" value="<?php echo $data['topic_section_id']; ?>">
 
                             <div class="pt-3 justify-content-center">
-                                <label class="form-label">ส่วนของการประเมินโครงงาน</label>
+                                <label class="form-label">ส่วนของการประเมินโครงงาน<span style="color: red;"> *</span></label>
                                 <input type="text" class="form-control" name="topic_section" placeholder="กรอกส่วนของการประเมินโครงงาน" required value="<?php echo $data['topic_section']; ?>">
                             </div>
 
                             <div class="pt-3 justify-content-center">
-                                <label class="form-label">น้ำหนักคะแนนส่วนของการประเมินเป็นเปอร์เซ็นต์</label>
+                                <label class="form-label">น้ำหนักคะแนนส่วนของการประเมินเป็นเปอร์เซ็นต์<span style="color: red;"> *</span></label>
                                 <?php
                                 $maxTopicSectionWeight = giveTopic_section_weight($conn) + $data['topic_section_weight'];
                                 ?>
@@ -170,8 +176,8 @@ function giveTopic_section_weight($conn)
 
 
                             <div id="topic_section_level">
-                                <label class="form-label">กำหนดสิทธิ์ส่วนของการประเมิน</label>
-                                <select id="selectbox" name="topic_section_level" class="form-select">
+                                <label class="form-label">กำหนดสิทธิ์ส่วนของการประเมิน<span style="color: red;"> *</span></label>
+                                <select id="selectbox" name="topic_section_level" class="form-select" required>
                                     <option value="0" <?php if ($data['topic_section_level'] == 0) echo 'selected'; ?>>กรรมการสอบ </option>
                                     <option value="1" <?php if ($data['topic_section_level'] == 1) echo 'selected'; ?>>อาจารย์ที่ปรึกษา </option>
                                     <option value="2" <?php if ($data['topic_section_level'] == 2) echo 'selected'; ?>>กรรมการสอบและอาจารย์ที่ปรึกษา</option>
@@ -180,8 +186,8 @@ function giveTopic_section_weight($conn)
 
 
                             <div id="topic_section_format">
-                                <label id="selectbox" class="form-label">รูปแบบการประเมิน</label>
-                                <select name="topic_section_format" class="form-select">
+                                <label id="selectbox" class="form-label">รูปแบบการประเมิน<span style="color: red;"> *</span></label>
+                                <select name="topic_section_format" class="form-select" required>
                                     <option value="0" <?php if ($data['topic_section_format'] == 0) echo 'selected'; ?>>ประเมินรายบุคคล</option>
                                     <option value="1" <?php if ($data['topic_section_format'] == 1) echo 'selected'; ?>>ประเมินรายกลุ่มโครงงาน</option>
                                 </select>
@@ -189,8 +195,8 @@ function giveTopic_section_weight($conn)
 
 
                             <div id="topic_section_status">
-                                <label id="selectbox" class="form-label">สถานะการใช้งาน</label>
-                                <select name="topic_section_status" class="form-select">
+                                <label id="selectbox" class="form-label">สถานะการใช้งาน<span style="color: red;"> *</span></label>
+                                <select name="topic_section_status" class="form-select" required>
                                     <option value="0" <?php if ($data['topic_section_status'] == 0) echo 'selected'; ?>>ปิดการใช้งาน </option>
                                     <option value="1" <?php if ($data['topic_section_status'] == 1) echo 'selected'; ?>>เปิดการใช้งาน </option>
                                 </select>

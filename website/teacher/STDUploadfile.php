@@ -5,7 +5,7 @@ if (!isset($_SESSION['teacher_login'])) {
     $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
     header('Location: ../index.php');
     exit();
-  }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +24,7 @@ if (!isset($_SESSION['teacher_login'])) {
     <!-- Link to icon -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
     <title>
-    เอกสารความคืบหน้าโครงงาน
+        เอกสารความคืบหน้าโครงงาน
     </title>
 
 
@@ -92,8 +92,17 @@ if (!isset($_SESSION['teacher_login'])) {
         function giveTeacherPositionById($Position)
         {
             switch ($Position) {
+                case "ศาสตราจารย์":
+                    return $Position = "ศ.";
+                    break;
+                case "ศาสตราจารย์ ดร.":
+                    return $Position = "ศ.ดร.";
+                    break;
                 case "รองศาสตราจารย์":
                     return $Position = "รศ.";
+                    break;
+                case "รองศาสตราจารย์ ดร.":
+                    return $Position = "รศ.ดร.";
                     break;
                 case "ผู้ช่วยศาสตราจารย์":
                     return $Position = "ผศ.";
@@ -103,6 +112,9 @@ if (!isset($_SESSION['teacher_login'])) {
                     break;
                 case "อาจารย์":
                     return $Position = "อ.";
+                    break;
+                case "อาจารย์ ดร.":
+                    return $Position = "อ.ดร.";
                     break;
                 case "ดร.":
                     return $Position = "ดร.";
@@ -160,7 +172,7 @@ if (!isset($_SESSION['teacher_login'])) {
 
                     </div>
 
-                    
+
                     <!-- --------------------------------------------------------หน้าปก upload---------------------------------------------------------------- -->
                     <div class="accordion" id="ProjectDocuments">
 
@@ -248,7 +260,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -428,7 +440,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -604,7 +616,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -779,7 +791,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -952,7 +964,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1124,7 +1136,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1296,7 +1308,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1469,7 +1481,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1641,7 +1653,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1814,7 +1826,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1992,7 +2004,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -2165,7 +2177,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -2341,7 +2353,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -2516,7 +2528,7 @@ if (!isset($_SESSION['teacher_login'])) {
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -2613,22 +2625,198 @@ if (!isset($_SESSION['teacher_login'])) {
 
 
         <script>
-            // สร้างคลิกอีเวนต์สำหรับทุกตัวที่มี id="toggleAccordion"
-            let toggleButtons = document.querySelectorAll("#toggleAccordion");
+            // // สร้างคลิกอีเวนต์สำหรับทุกตัวที่มี id="toggleAccordion"
+            // let toggleButtons = document.querySelectorAll("#toggleAccordion");
 
-            // สร้าง event listener สำหรับแต่ละ button
-            toggleButtons.forEach(function(button) {
-                let isOpen = true;
-                button.addEventListener("click", function() {
-                    var hiddenContent = button.nextElementSibling; // หา element ถัดไปจาก button
+            // // สร้าง event listener สำหรับแต่ละ button
+            // toggleButtons.forEach(function(button) {
+            //     let isOpen = true;
+            //     button.addEventListener("click", function() {
+            //         var hiddenContent = button.nextElementSibling; // หา element ถัดไปจาก button
 
-                    if (isOpen) { // ถ้า isOpen เป็น true
-                        hiddenContent.style.display = "block"; // แสดงเนื้อหา
+            //         if (isOpen) { // ถ้า isOpen เป็น true
+            //             hiddenContent.style.display = "block"; // แสดงเนื้อหา
+            //         } else {
+            //             hiddenContent.style.display = "none"; // ซ่อนเนื้อหา
+            //         }
+
+            //         isOpen = !isOpen; // สลับค่า isOpen ระหว่าง true และ false
+            //     });
+            // });
+
+
+            // ===========================================================================================================
+            //  check ดูการกดของ element buttonsend เเล้วมีการเก็บ commentStatus ไว้หลัง refresh จะ focus มาที่ element
+
+            document.addEventListener("DOMContentLoaded", function() {
+
+                // หาปุ่มที่ใช้ในการแสดงหรือซ่อนความคิดเห็น
+                const toggleButtons = document.querySelectorAll("#toggleAccordion");
+                const hiddenContent = document.querySelectorAll("#hiddenContent");
+                const buttonsend = document.querySelectorAll("#buttonsend");
+                console.log(buttonsend);
+
+                // สร้าง event listener สำหรับแต่ละปุ่ม
+                toggleButtons.forEach(function(button, index) {
+                    // เพิ่ม event listener สำหรับปุ่มเพื่อแสดงหรือซ่อนความคิดเห็น
+                    button.addEventListener("click", function() {
+                        // ตรวจสอบว่า index ของปุ่มตรงกับ index ของ buttonsend หรือไม่
+                        buttonsend.forEach(function(buttonsend, sendIndex) {
+                            // เพิ่ม event listener สำหรับปุ่มส่งความคิดเห็น
+                            buttonsend.addEventListener("click", function() {
+                                localStorage.setItem("commentStatus" + sendIndex, "open");
+                                const parentCollapse = this.closest(".accordion-item").querySelector(".accordion-collapse");
+                                if (parentCollapse) {
+                                    // บันทึกสถานะ accordion-collapse ที่กดเปิดไว้ใน localStorage
+                                    localStorage.setItem("accordionCollapseStatus", parentCollapse.id);
+                                }
+
+                                // ตรวจสอบว่า index ของปุ่มส่งที่ถูกคลิกตรงกับ index ของปุ่ม toggle
+                                if (sendIndex === index) {
+                                    // ถ้าเป็น Index เดียวกัน ให้แสดง hiddenContent และปุ่ม toggle ที่เกี่ยวข้องกัน
+                                    hiddenContent.forEach(function(content, contentIndex) {
+                                        if (contentIndex === index) {
+                                            content.style.display = "block"; // แสดงเนื้อหา
+                                        } else {
+                                            content.style.display = "none"; // ซ่อนเนื้อหา
+                                        }
+                                    });
+                                    toggleButtons.forEach(function(toggleButton, toggleIndex) {
+                                        if (toggleIndex === index) {
+                                            toggleButton.textContent = "ซ่อนความคิดเห็น"; // เปลี่ยนข้อความบนปุ่ม
+                                        } else {
+                                            toggleButton.textContent = "ความคิดเห็น"; // เปลี่ยนข้อความบนปุ่ม
+                                        }
+                                    });
+                                }
+                            });
+                        });
+
+                        if (index < hiddenContent.length) {
+                            const content = hiddenContent[index];
+                            if (content.style.display === "none") {
+                                // ถ้าเนื้อหาถูกซ่อนหรือไม่แสดง
+                                content.style.display = "block"; // แสดงเนื้อหา                 
+                                button.textContent = "ซ่อนความคิดเห็น"; // เปลี่ยนข้อความบนปุ่ม
+                            } else {
+                                content.style.display = "none"; // ซ่อนเนื้อหา
+                                localStorage.setItem("commentStatus" + index, "closed");
+                                button.textContent = "ความคิดเห็น"; // เปลี่ยนข้อความบนปุ่ม
+                            }
+                        }
+                    });
+                });
+
+                // ตรวจสอบสถานะความคิดเห็นเมื่อหน้าเว็บโหลด
+                toggleButtons.forEach(function(button, index) {
+                    const commentStatus = localStorage.getItem("commentStatus" + index);
+                    if (commentStatus === "open") {
+                        // ถ้าสถานะความคิดเห็นเป็น "open" ให้แสดงความคิดเห็น
+                        hiddenContent.forEach(function(content, contentIndex) {
+                            if (contentIndex === index) {
+                                content.style.display = "block"; // แสดงเนื้อหา
+                                localStorage.setItem("commentStatus" + index, "closed");
+                            } else {
+                                content.style.display = "none"; // ซ่อนเนื้อหา
+                            }
+                            button.textContent = "ซ่อนความคิดเห็น"; // เปลี่ยนข้อความบนปุ่ม
+                        });
+
                     } else {
-                        hiddenContent.style.display = "none"; // ซ่อนเนื้อหา
+                        localStorage.removeItem("commentStatus" + index);
+                    }
+                });
+
+
+                // ===========================================================================================================
+                //  check ดูการกดของ element accordionCollapseStatus เเล้วมีการเก็บ commentStatus ไว้หลัง refresh จะ focus มาที่ element
+
+                // ให้ตรวจสอบ localStorage สำหรับสถานะ accordion-collapse
+                function checkAccordionStatus() {
+                    const collapseStatus = localStorage.getItem("accordionCollapseStatus");
+                    if (collapseStatus) {
+                        const accordionCollapseElements = document.querySelectorAll(".accordion-collapse");
+                        accordionCollapseElements.forEach((collapse) => {
+                            if (collapse.id === collapseStatus) {
+                                // เปิด accordion-collapse ที่มี id ตรงกับสถานะใน localStorage
+                                collapse.classList.add("show");
+                                // หาปุ่มที่ใช้ในการเปิด accordion-collapse
+                                const button = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                                if (button) {
+                                    // เพิ่มคลาส "accordion-button" ให้กับปุ่ม
+                                    button.classList.remove('collapsed');
+                                } else {
+                                    button.classList.add("accordion-button collapsed");
+                                }
+                            }
+                        });
                     }
 
-                    isOpen = !isOpen; // สลับค่า isOpen ระหว่าง true และ false
+                }
+
+                // ตรวจสอบสถานะ accordion-collapse เมื่อหน้าเว็บโหลด
+                checkAccordionStatus();
+
+                // ตรวจสอบการคลิกที่ลิงก์ "ลบเอกสาร"
+                const approveLinks = document.querySelectorAll(".btn.btn-danger.ms-2");
+                approveLinks.forEach((approveLink, index) => {
+                    approveLink.addEventListener("click", function(e) {
+                        const parentCollapse = this.closest(".accordion-item").querySelector(".accordion-collapse");
+                        if (parentCollapse) {
+                            // บันทึกตำแหน่ง scroll ใน localStorage
+                            localStorage.setItem("scrollPositionY", window.scrollY);
+                            // บันทึกสถานะ accordion-collapse ที่กดเปิดไว้ใน localStorage
+                            localStorage.setItem("accordionCollapseStatus", parentCollapse.id);
+
+                            // หาปุ่มที่ใช้ในการเปิด accordion-collapse
+                            const button = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+                            if (button) {
+                                // เพิ่มคลาส "accordion-button" ให้กับปุ่ม
+                                button.classList.remove('collapsed');
+                            } else {
+                                button.classList.add("accordion-button collapsed");
+                            }
+                        }
+                    });
+                });
+                // logout clear ค่า
+                document.querySelector('#logoutLink').addEventListener('click', function() {
+                    // ลบค่า scroll ใน Local Storage
+                    localStorage.removeItem('accordionCollapseStatus');
+                    // ลบค่า commentStatus ออกจาก localStorage
+                    for (let index = 0; index < toggleButtons.length; index++) {
+                        localStorage.removeItem("commentStatus" + index);
+                    }
+                });
+
+            });
+
+            // ตรวจสอบว่ามีตำแหน่ง scroll ที่ถูกบันทึกไว้ใน localStorage หรือไม่
+            const scrollPositionY = localStorage.getItem("scrollPositionY");
+            if (scrollPositionY) {
+                // คืนค่าตำแหน่ง scroll ให้กับหน้าเว็บ
+                window.scrollTo(0, scrollPositionY);
+
+                // หลังจากคืนค่าตำแหน่ง scroll ให้ลบค่าที่ถูกบันทึกไว้ใน localStorage ออก
+                localStorage.removeItem("scrollPositionY");
+            }
+
+
+            // ตรวจสอบสถานะ accordion-collapse เมื่อมีการคลิกที่ปุ่มหรือไม่เมื่อเปลี่ยนที่คลิก
+            const accordionButtons = document.querySelectorAll("[data-bs-toggle='collapse']");
+            accordionButtons.forEach((button) => {
+                button.addEventListener("click", function() {
+                    const targetCollapseId = this.getAttribute("data-bs-target").replace("#", "");
+                    const isAccordionOpen = this.getAttribute("aria-expanded") === "true";
+
+                    if (isAccordionOpen) {
+                        // ตรวจสอบว่ามีค่า accordionCollapseStatus ใน localStorage
+                        const accordionCollapseStatus = localStorage.getItem("accordionCollapseStatus");
+                        if (accordionCollapseStatus) {
+                            // ถ้ามีค่าใน localStorage ให้ลบออก
+                            localStorage.removeItem("accordionCollapseStatus");
+                        }
+                    }
                 });
             });
         </script>

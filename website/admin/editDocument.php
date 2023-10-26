@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+}
+
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     if (isset($_FILES["document_path"]) && $_FILES["document_path"]["size"] > 0) {
@@ -19,21 +25,28 @@ if (isset($_POST['update'])) {
             $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($existingFile) {
-                $_SESSION['error'] = 'ชื่อไฟล์ซ้ำกันในระบบ ไม่สามารถอัปโหลดได้';
-                header('location: editDocument.php?id='.$id);
-                exit;
-            } else {
-                if (move_uploaded_file($_FILES["document_path"]["tmp_name"], $targetFile)) {
-                    // เพิ่มข้อมูลลงในฐานข้อมูล
-                } else {
-                    $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
-                    header('location: editDocument.php?id='.$id);
-                    exit;
+                $filename = pathinfo($document_path, PATHINFO_FILENAME); // ดึงชื่อไฟล์แต่ไม่รวมนามสกุล
+                $file_extension = pathinfo($document_path, PATHINFO_EXTENSION); // ดึงนามสกุลไฟล์
+
+                $counter = 1;
+                while (file_exists($targetFile)) {
+                    // เพิ่มเลขต่อท้ายชื่อไฟล์
+                    $document_path = $filename . '_' . $counter . '.' . $file_extension;
+                    $targetFile = $targetDir . $document_path;
+                    $counter++;
                 }
+            }
+            if (move_uploaded_file($_FILES["document_path"]["tmp_name"], $targetFile)) {
+
+                // เพิ่มข้อมูลลงในฐานข้อมูล
+            } else {
+                $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
+                header('location: editDocument.php?id=' . $id);
+                exit;
             }
         } else {
             $_SESSION['error'] = 'กรุณาเลือกไฟล์ใหม่ที่ต้องการอัปโหลด';
-            header('location: editDocument.php?id='.$id);
+            header('location: editDocument.php?id=' . $id);
             exit;
         }
     } else {
@@ -60,8 +73,7 @@ if (isset($_POST['update'])) {
             $year = empty($year) ? null : $year;
             $term = empty($term) ? null : $term;
 
-
-            $sql = $conn->prepare("UPDATE `document` SET document_path = :document_path, document_name = :document_name, document_date = CONCAT(YEAR(NOW()) + 543, DATE_FORMAT(NOW(), '-%m-%d %H:%i:%s')), year = :year,  term = :term WHERE document_id = :id");
+            $sql = $conn->prepare("UPDATE `document` SET document_path = :document_path, document_name = :document_name, document_date = CONCAT(YEAR(NOW()) + 543, DATE_FORMAT(NOW(), '-%m-%d %H:%i:%s')), year = :year, term = :term WHERE document_id = :id");
             $sql->bindParam(':id', $id);
             $sql->bindParam(':document_path', $document_path);
             $sql->bindParam(':document_name', $document_name);
@@ -69,7 +81,7 @@ if (isset($_POST['update'])) {
             $sql->bindParam(':term', $term);
             $sql->execute();
             if ($sql) {
-                $_SESSION['success'] = '<strong>ชื่อเอกสาร </strong> '.$document_name . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
+                $_SESSION['success'] = '<strong>ชื่อเอกสาร </strong> ' . $document_name . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
                 header("Location: ./documentmanage.php");
                 exit();
             } else {
@@ -83,6 +95,7 @@ if (isset($_POST['update'])) {
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -173,7 +186,7 @@ if (isset($_POST['update'])) {
                             <input type="hidden" name="id" value="<?php echo $data['document_id']; ?>">
 
                             <div id="document_path">
-                                <label class="form-label">เอกสารในรายวิชา</label>
+                                <label class="form-label">เอกสารในรายวิชา<span style="color: red;"> *</span></label>
                                 <input type="file" class="form-control" name="document_path" id="document_path" accept=".pdf,.docx">
                                 <?php if (!empty($data['document_path'])) : ?>
                                     <div class="pt-3 justify-content-center">
@@ -186,18 +199,18 @@ if (isset($_POST['update'])) {
                             </div>
 
                             <div class="pt-3 justify-content-center">
-                                <label class="form-label">ชื่อเอกสารในรายวิชา</label>
-                                <input type="text" class="form-control" name="document_name" placeholder="Enter new group ID" required value="<?php echo $data['document_name']; ?>">
+                                <label class="form-label">ชื่อเอกสารในรายวิชา<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="document_name" placeholder="ชื่อเอกสารในรายวิชา" required value="<?php echo $data['document_name']; ?>">
 
 
                                 <div id="year">
-                                    <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน</label>
-                                    <input type="number" class="form-control" name="year" id="year" value="<?php echo isset($data['year']) ? $data['year'] : ''; ?>" placeholder="25xx">
+                                    <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                                    <input type="number" class="form-control" name="year" id="year" value="<?php echo isset($data['year']) ? $data['year'] : ''; ?>" placeholder="ปีการศึกษาที่เริ่มใช้งาน" required>
                                 </div>
 
                                 <div id="term">
-                                    <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน</label>
-                                    <select name="term" class="form-select">
+                                    <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                                    <select name="term" class="form-select" required>
                                         <option value=""  <?php if (empty($data['term'])) echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                                         <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                                         <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>

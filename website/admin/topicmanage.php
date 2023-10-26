@@ -5,6 +5,7 @@ require_once "../connect.php";
 if (!isset($_SESSION['admin_login'])) {
   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
   header('Location: ../index.php');
+  exit();
 }
 
 // delete data
@@ -15,7 +16,7 @@ if (isset($_GET['delete'])) {
   $deletestmt->execute();
   if ($deletestmt) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./topicmanage.php");
   }
 }
@@ -70,13 +71,13 @@ if (isset($_GET['delete'])) {
                 </div> -->
 
                 <div id="topic_name">
-                  <label class="form-label">ชื่อหัวข้อการประเมิน</label>
-                  <input type="text" class="form-control" name="topic_name" id="topic_name" value="<?php echo isset($_POST['topic_name']) ?  $_POST['topic_name'] : '' ?>" placeholder="ชื่อหัวข้อการประเมินโครงงาน">
+                  <label class="form-label">ชื่อหัวข้อการประเมิน<span style="color: red;"> *</span></label>
+                  <input type="text" class="form-control" name="topic_name" id="topic_name" value="<?php echo isset($_POST['topic_name']) ?  $_POST['topic_name'] : '' ?>" placeholder="ชื่อหัวข้อการประเมินโครงงาน" required>
                 </div>
 
                 <div id="topic_section_id">
-                  <label class="form-label">ส่วนของการประเมิน</label>
-                  <select id="selectbox" name="topic_section_id" class="form-select">
+                  <label class="form-label">ส่วนของการประเมิน<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="topic_section_id" class="form-select" required>
 
                     <?php
                     $groups = $conn->query("SELECT * FROM `topicsection` ORDER BY topic_section_id DESC");
@@ -102,8 +103,8 @@ if (isset($_GET['delete'])) {
 
 
                 <div id="topic_status">
-                  <label class="form-label">สถานะการใช้งาน</label>
-                  <select name="topic_status" class="form-select">
+                  <label class="form-label">สถานะการใช้งาน<span style="color: red;"> *</span></label>
+                  <select name="topic_status" class="form-select" required>
                     <option value="0">ปิดการใช้งาน</option>
                     <option value="1">เปิดการใช้งาน</option>
                   </select>

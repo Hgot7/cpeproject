@@ -2,11 +2,11 @@
 session_start();
 require_once "../connect.php";
 
-// if (!isset($_SESSION['admin_login'])) {
-//   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
-//   header('Location: ../index.php');
-// }
-
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
 //                                   delete data
 if (isset($_GET['delete'])) {
   $delete_id = $_GET['delete'];
@@ -18,7 +18,7 @@ if (isset($_GET['delete'])) {
   // รันคำสั่ง SQL
   if ($deletestmt->execute()) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./topicSectionmanage.php");
   }
 }
@@ -86,21 +86,21 @@ function giveTopic_section_weight($conn)
           <div class="modal-body">
             <form action="./add_dataTopicSection.php" method="post" enctype="multipart/form-data">
               <div id="topic_section">
-                <label class="form-label">ส่วนของการประเมินโครงงาน</label>
+                <label class="form-label">ส่วนของการประเมินโครงงาน<span style="color: red;"> *</span></label>
                 <input type="text" class="form-control" name="topic_section" id="topic_section" value="<?php if (isset($_POST['topic_section'])) {
                                                                                                           echo $_POST['topic_section'];
-                                                                                                        } ?>" placeholder="ส่วนของการประเมินโครงงาน">
+                                                                                                        } ?>" placeholder="ส่วนของการประเมินโครงงาน" required>
               </div>
 
 
               <div id="topic_section_weight">
-                <label class="form-label">น้ำหนักคะแนนส่วนของการประเมินเป็นเปอร์เซ็นต์</label>
-                <input type="number" class="form-control" name="topic_section_weight" id="topic_section_weight" placeholder="ใส่แค่เลขไม่ต้องใส่ %" value="<?php echo giveTopic_section_weight($conn); ?>" max="<?php echo giveTopic_section_weight($conn); ?>">
+                <label class="form-label">น้ำหนักคะแนนส่วนของการประเมินเป็นเปอร์เซ็นต์<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="topic_section_weight" id="topic_section_weight" required placeholder="ใส่เฉพาะเลขไม่เอา(%)" value="<?php echo giveTopic_section_weight($conn); ?>" max="<?php echo giveTopic_section_weight($conn); ?>">
               </div>
 
               <div id="topic_section_level">
-                <label class="form-label">กำหนดสิทธิ์ส่วนของการประเมิน</label>
-                <select id="selectbox" name="topic_section_level" class="form-select">
+                <label class="form-label">กำหนดสิทธิ์ส่วนของการประเมิน<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="topic_section_level" class="form-select" required>
                   <option value="0">กรรมการสอบ</option>
                   <option value="1">อาจารย์ที่ปรึกษา </option>
                   <option value="2">กรรมการสอบและอาจารย์ที่ปรึกษา</option>
@@ -109,8 +109,8 @@ function giveTopic_section_weight($conn)
 
 
               <div id="topic_section_format">
-                <label id="selectbox" class="form-label">รูปแบบการประเมิน</label>
-                <select name="topic_section_format" class="form-select">
+                <label id="selectbox" class="form-label">รูปแบบการประเมิน<span style="color: red;"> *</span></label>
+                <select name="topic_section_format" class="form-select" required>
                   <option value="0">ประเมินรายบุคคล</option>
                   <option value="1">ประเมินรายกลุ่มโครงงาน</option>
                 </select>
@@ -119,8 +119,8 @@ function giveTopic_section_weight($conn)
 
 
               <div id="topic_section_status">
-                <label id="selectbox" class="form-label">สถานะการใช้งาน</label>
-                <select name="topic_section_status" class="form-select">
+                <label id="selectbox" class="form-label">สถานะการใช้งาน<span style="color: red;"> *</span></label>
+                <select name="topic_section_status" class="form-select" required>
                   <option value="0">ปิดการใช้งาน</option>
                   <option value="1">เปิดการใช้งาน</option>
                 </select>

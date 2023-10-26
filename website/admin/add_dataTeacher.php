@@ -5,7 +5,7 @@
 
 if (isset($_POST['submit'])) {
   // collect value of input field
-  // $inputteacher_id = $_POST['inputteacher_id'];
+  $inputteacher_id = $_POST['inputteacher_id'];
   $inputteacher_username = $_POST['inputteacher_username'];
   $inputteacher_password = $_POST['inputteacher_password'];
   $inputposition = $_POST['inputposition'];
@@ -25,17 +25,18 @@ if (isset($_POST['submit'])) {
   $inputphone = empty($inputphone) ? null : $inputphone;
   $inputlevel_id = empty($inputlevel_id) ? null : $inputlevel_id;
 
-  // if(empty($inputteacher_id)){
-  //   $_SESSION['error'] = 'กรุณากรอก ID';
-  //   header('location: teachermanage.php');
-  // }else {
+  if(empty($inputteacher_username)){
+    $_SESSION['error'] = 'กรุณากรอก ชื่อผู้ใช้งานระบบ';
+    header('location: teachermanage.php');
+    exit;
+  }
 
     try {
        if(!isset($_SESSION['error'])){
         $passwordHash = password_hash($inputteacher_password, PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("INSERT INTO `teacher` (teacher_username, teacher_password, position, firstname, lastname, email, phone, level_id) 
-                VALUES (:inputteacher_username, :passwordHash, :inputposition, :inputfirstname, :inputlastname, :inputemail, :inputphone, :inputlevel_id)");
-        // $stmt->bindParam(':inputteacher_id', $inputteacher_id);
+        $stmt = $conn->prepare("INSERT INTO `teacher` (teacher_id,teacher_username, teacher_password, position, firstname, lastname, email, phone, level_id) 
+                VALUES (:inputteacher_id, :inputteacher_username, :passwordHash, :inputposition, :inputfirstname, :inputlastname, :inputemail, :inputphone, :inputlevel_id)");
+        $stmt->bindParam(':inputteacher_id', $inputteacher_id);
         $stmt->bindParam(':inputteacher_username', $inputteacher_username);
         $stmt->bindParam(':passwordHash', $passwordHash);
         $stmt->bindParam(':inputposition', $inputposition);

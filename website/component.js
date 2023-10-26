@@ -274,7 +274,7 @@ class SideBarAdmin extends HTMLElement {
             
 
             <li class="nav-item pb-2">
-                <a href="../logout_Admin.php" class="nav-link active" aria-current="page">
+                <a href="../logout_Admin.php" class="nav-link active" aria-current="page" id="logoutLink">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow">
                             <i class="bi bi-box-arrow-right h4"></i>
@@ -303,6 +303,12 @@ class SideBarAdmin extends HTMLElement {
         // กำหนดค่าตำแหน่ง scroll ให้กับ sidebar
         document.querySelector('#sidebar').scrollTop = parseInt(savedScrollPosition);
       }
+    });
+    
+    document.querySelector('#logoutLink').addEventListener('click', function() {
+      // ลบค่า scroll ใน Local Storage
+      localStorage.removeItem('sidebarScrollPosition');
+      // สามารถเรียกใช้งานหน้า logout ของคุณได้ที่นี่
     });
   }
 }

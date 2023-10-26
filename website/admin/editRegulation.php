@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
+
 if (isset($_POST['update'])) {
   $regulation_id = $_POST['id'];
   $regulationFile_path = $_POST['regulationFile_path'];
@@ -13,70 +19,71 @@ if (isset($_POST['update'])) {
     $uploadOk = 1;
     $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
+    // ตรวจสอบชื่อไฟล์ซ้ำ
     if ($uploadOk == 1) {
-      // ดำเนินการตรวจสอบชื่อไฟล์ซ้ำ
       $stmt = $conn->prepare("SELECT regulationFile_path FROM `regulation` WHERE regulationFile_path = :regulationFile_path");
       $stmt->bindParam(':regulationFile_path', $regulationFile_path);
       $stmt->execute();
       $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
 
       if ($existingFile) {
-        $_SESSION['error'] = 'ชื่อไฟล์ซ้ำกันในระบบ ไม่สามารถอัปโหลดได้';
-        header('location: editRegulation.php?id='.$regulation_id);
-        exit;
-      } else {
-        if (move_uploaded_file($_FILES["regulationFile_path"]["tmp_name"], $targetFile)) {
-          // เพิ่มข้อมูลลงในฐานข้อมูล
-        } else {
-          $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
-          header('location: editRegulation.php?id='.$regulation_id);
-          exit;
+        $filename = pathinfo($regulationFile_path, PATHINFO_FILENAME);
+        $file_extension = pathinfo($regulationFile_path, PATHINFO_EXTENSION);
+
+        $counter = 1;
+        while (file_exists($targetFile)) {
+          $regulationFile_path = $filename . '_' . $counter . '.' . $file_extension;
+          $targetFile = $targetDir . $regulationFile_path;
+          $counter++;
         }
+      }
+
+      if (move_uploaded_file($_FILES["regulationFile_path"]["tmp_name"], $targetFile)) {
+        // ไฟล์ถูกอัปโหลดสำเร็จ
+      } else {
+        $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
+        header('location: editRegulation.php?id=' . $regulation_id);
+        exit;
       }
     } else {
       $_SESSION['error'] = 'กรุณาเลือกไฟล์ใหม่ที่ต้องการอัปโหลด';
-      header('location: editRegulation.php?id='.$regulation_id);
+      header('location: editRegulation.php?id=' . $regulation_id);
       exit;
     }
   } else {
-    $regulationFile_path = ""; // กำหนดค่าเป็นค่าว่างเมื่อไม่มีไฟล์ถูกอัปโหลด
+    $regulationFile_path = $_POST["existing_regulationFile_path"];
   }
-
 
   $New_regulation_text = $_POST['input_regulation_text'];
   $New_year = $_POST['input_year'];
   $New_term = $_POST['input_term'];
 
   try {
-    if (!isset($_SESON['error'])) {
+    if (!isset($_SESSION['error'])) {
+      $stmt = $conn->prepare("SELECT * FROM `regulation` WHERE regulation_id = :regulation_id");
+      $stmt->bindParam(':regulation_id', $regulation_id);
+      $stmt->execute();
+      $data = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      if (empty($regulationFile_path)) {
-        $regulationFile_path = $_POST["existing_regulationFile_path"];
-    } else {
-        $stmt = $conn->prepare("SELECT * FROM `regulation` WHERE regulation_id = :regulation_id");
-        $stmt->bindParam(':regulation_id', $regulation_id);
-        $stmt->execute();
-        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+      if (!empty($regulationFile_path) && $regulationFile_path !== $data["regulationFile_path"]) {
         unlink("uploadfileRegulation/" . $data["regulationFile_path"]);
-    }
-
+      }
 
       $regulationFile_path = empty($regulationFile_path) ? null : $regulationFile_path;
       $New_regulation_text = empty($New_regulation_text) ? null : $New_regulation_text;
       $New_year = empty($New_year) ? null : $New_year;
       $New_term = empty($New_term) ? null : $New_term;
 
-      $sql = $conn->prepare("UPDATE `regulation` SET regulationFile_path = :regulationFile_path, regulation_text= :input_regulation_text, year = :input_year, term = :input_term WHERE regulation_id = :id");
+      $sql = $conn->prepare("UPDATE `regulation` SET regulationFile_path = :regulationFile_path, regulation_text = :input_regulation_text, year = :input_year, term = :input_term WHERE regulation_id = :id");
       $sql->bindParam(':id', $regulation_id);
       $sql->bindParam(':regulationFile_path', $regulationFile_path);
       $sql->bindParam(':input_regulation_text', $New_regulation_text);
       $sql->bindParam(':input_year', $New_year);
       $sql->bindParam(':input_term', $New_term);
 
-
       $sql->execute();
       if ($sql) {
-        $_SESSION['success'] ='<strong>ข้อมูลกฎข้อบังคับ </strong>'.$New_regulation_text . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
+        $_SESSION['success'] = '<strong>ข้อมูลกฎข้อบังคับ </strong>' . $New_regulation_text . ' ได้รับการแก้ไขเรียบร้อยแล้ว';
         header("location: ./regulationmanage.php");
         exit;
       } else {
@@ -90,6 +97,7 @@ if (isset($_POST['update'])) {
   }
 }
 ?>
+
 
 <!DOCTYPE html>
 
@@ -180,18 +188,18 @@ if (isset($_POST['update'])) {
                             </div>
 
               <div id="input_regulation_text">
-                <label class="form-label">กฎข้อบังคับในรายวิชา</label>
-                <input type="text" id="input_regulation_text" name="input_regulation_text" class="form-control"  placeholder="เนื้อหากฎข้อบังคับเพิ่มเติม" value="<?php echo $data['regulation_text'] ?? ''; ?>">
+                <label class="form-label">กฎข้อบังคับในรายวิชา<span style="color: red;"> *</span></label>
+                <input type="text" id="input_regulation_text" name="input_regulation_text" class="form-control"  placeholder="เนื้อหากฎข้อบังคับเพิ่มเติม" value="<?php echo $data['regulation_text'] ?? ''; ?>" required>
               </div>
 
               <div id="input_year">
-                                <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน</label>
-                                <input type="number" class="form-control" name="input_year" id="input_year" value="<?php echo isset($data['year']) ? $data['year'] : ''; ?>" placeholder="25xx">
+                                <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                                <input type="number" class="form-control" name="input_year" id="input_year" value="<?php echo isset($data['year']) ? $data['year'] : ''; ?>" placeholder="ปีการศึกษาที่ใช้งาน" required>
                             </div>
 
                             <div id="input_term">
-                                <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน</label>
-                                <select name="input_term" class="form-select">
+                                <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                                <select name="input_term" class="form-select" required>
                                 <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                                     <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                                     <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>

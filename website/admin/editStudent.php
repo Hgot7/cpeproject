@@ -2,6 +2,11 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
 if (isset($_POST['update'])) {
   $std_id = $_POST['id'];
   $Newpassword = $_POST['inputpassword'];
@@ -48,6 +53,41 @@ if (isset($_POST['update'])) {
       $New_group = empty($New_group) ? null : $New_group;
       $New_grade = empty($New_grade) ? null : $New_grade;
 
+      if (empty($NewstudentID)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($Newfirstname)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($Newlastname)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($New_year)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($New_term)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($New_email)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
+      if (empty($New_group)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: studentmanage.php");
+        exit();
+      }
       $sql = $conn->prepare("UPDATE `student` SET student_id = :new_student_id, firstname = :inputfirstname, lastname = :inputlastname, year = :inputyear, term = :inputterm, email = :email
       , phone = :inputphone, group_id = :inputgroup_id, grade = :inputgrade WHERE student_id = :id");
       $sql->bindParam(':new_student_id', $NewstudentID);
@@ -148,8 +188,8 @@ if (isset($_POST['update'])) {
               <input type="hidden" name="id" value="<?php echo $data['student_id']; ?>">
 
               <div class="pt-3 justify-content-center">
-                <label class="form-label">รหัสประจำตัวนักศึกษา</label>
-                <input type="number" class="form-control" name="new_student_id" placeholder="รหัสรหัสประจำตัวนักศึกษาไม่เอา( - )" required value="<?php echo $data['student_id']; ?>"readonly>
+                <label class="form-label">รหัสประจำตัวนักศึกษา<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="new_student_id" id="new_student_id" placeholder="รหัสรหัสประจำตัวนักศึกษาไม่เอา( - )" required value="<?php echo $data['student_id']; ?>">
               </div>
 
 
@@ -159,23 +199,23 @@ if (isset($_POST['update'])) {
               </div> -->
 
               <div id="inputfirstname">
-                <label class="form-label">ชื่อ</label>
-                <input type="text" class="form-control" name="inputfirstname" id="inputfirstname" value="<?php echo $data['firstname']; ?>" placeholder="ชื่อ">
+                <label class="form-label">ชื่อ<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputfirstname" id="inputfirstname" value="<?php echo $data['firstname']; ?>"required placeholder="ชื่อ">
               </div>
 
               <div id="inputlastname">
-                <label class="form-label">นามสกุล</label>
-                <input type="text" class="form-control" name="inputlastname" id="inputlastname" value="<?php echo $data['lastname']; ?>" placeholder="นามสกุล">
+                <label class="form-label">นามสกุล<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputlastname" id="inputlastname" value="<?php echo $data['lastname']; ?>"required placeholder="นามสกุล">
               </div>
 
               <div id="inputyear">
-                <label class="form-label">ปีการศึกษาที่ลงทะเบียน</label>
-                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo $data['year']; ?>" placeholder="ปีการศึกษาที่ลงทะเบียน">
+                <label class="form-label">ปีการศึกษาที่ลงทะเบียน<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo $data['year']; ?>"required placeholder="ปีการศึกษาที่ลงทะเบียน">
               </div>
 
               <div id="inputterm">
-                <label class="form-label">ภาคการศึกษา</label>
-                <select id="selectbox" name="inputterm" class="form-select">
+                <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="inputterm" class="form-select" required>
                 <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -183,22 +223,22 @@ if (isset($_POST['update'])) {
                 </select>
               </div>
 
-              <div id="email">
-                <label class="form-label">อีเมล</label>
-                <input type="text" class="form-control" name="email" id="email" value="<?php echo $data['email']; ?>" placeholder="@email.com">
+              <div id="email" >
+                <label class="form-label">อีเมล<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="email" id="email" value="<?php echo $data['email']; ?>" required placeholder="@mail.rmutt.ac.th">
               </div>
 
               <div id="inputphone">
                 <label class="form-label">เบอร์โทรศัพท์</label>
-                <input type="text" class="form-control" name="inputphone" id="inputphone" value="<?php echo $data['phone']; ?>" placeholder="092xxxxxxx">
+                <input type="text" class="form-control" name="inputphone" id="inputphone" value="<?php echo $data['phone']; ?>" placeholder="เบอร์โทรศัพท์ไม่เอา( - )">
               </div>
 
 
 
 
               <div class="col-md-4">
-                <label class="form-label">กลุ่มเรียนนักศึกษา</label>
-                <select id="selectbox" name="inputgroup_id" class="form-select">
+                <label class="form-label">กลุ่มเรียนนักศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="inputgroup_id" class="form-select" required>
                   <option value="<?php echo null ?>">เลือกกลุ่มเรียน</option>
                   <?php
                   $groups = $conn->query("SELECT * FROM `groups` ORDER BY group_id DESC");

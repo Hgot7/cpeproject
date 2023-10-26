@@ -6,6 +6,7 @@ require_once "../connect.php";
 if (!isset($_SESSION['admin_login'])) {
   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
   header('Location: ../index.php');
+  exit();
 }
 
 //                                   delete data
@@ -97,16 +98,32 @@ if (isset($_GET['delete'])) {
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                       if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+                        unset($_SESSION['selectedGroup']);
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+                        $selectedGroup = $_SESSION['selectedGroup'];
+                      }
                       $years = $conn->query("SELECT DISTINCT year FROM `student` ORDER BY year DESC");
                       $years->execute();
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                          $yearValue = $datayear['year'];
+                          $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                            <?php echo $yearValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -119,11 +136,14 @@ if (isset($_GET['delete'])) {
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -141,17 +161,23 @@ if (isset($_GET['delete'])) {
                       ?>
                       <option value="">เลือกกลุ่มเรียน</option>
                       <?php
-                      while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datagroup['group_name']; ?>">
-                          <?php echo $datagroup['group_name']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) {
+                          $groupValue = $datagroup['group_name'];
+                          $isGroupSelected = ($selectedGroup == $groupValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $groupValue; ?>" <?php echo $isGroupSelected; ?>>
+                            <?php echo $groupValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
 
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                  </div>
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                   </div>
                 </div>
               </form>
@@ -220,7 +246,7 @@ if (isset($_GET['delete'])) {
                         $stmt = $conn->prepare($sql);
                         $stmt->execute();
                         $users = $stmt->fetchAll();
-                        $selected = 'เกรดนักศึกษาทั้งหมด';
+                        $selected = 'เกรดนักศึกษาทั้งหมดในระบบ';
                       } elseif (empty($selectedYear) && !empty($selectedTerm) && !empty($selectedGroup)) {   //ใส่ selectedTerm และ selectedGroup
 
                         $sql = "SELECT student.*
@@ -316,7 +342,7 @@ if (isset($_GET['delete'])) {
                       $stmt->execute();
                       $users = $stmt->fetchAll();
                       $index = 1;
-                      $selected = 'เกรดนักศึกษาทั้งหมด';
+                      $selected = 'เกรดนักศึกษาทั้งหมดในระบบ';
                       if (!$users) {
                         echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
                       } else {
@@ -344,7 +370,7 @@ if (isset($_GET['delete'])) {
                       $stmt->execute();
                       $users = $stmt->fetchAll();
                       $index = 1;
-                      $selected = 'เกรดนักศึกษาทั้งหมด';
+                      $selected = 'เกรดนักศึกษาทั้งหมดในระบบ';
                       if (!$users) {
                         echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
                       } else {

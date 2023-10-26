@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['update'])) {
     $timeTest_id = $_POST['id'];
     $timeTest_date = $_POST['timeTest_date'];
@@ -132,28 +138,28 @@ if (isset($_POST['update'])) {
                                 <input type="text" class="form-control" name="new_timeTest_id" placeholder="Enter new group ID" required value="<?php echo $data['timeTest_id']; ?>" placeholder="yyyy-mm-dd">
                             </div> -->
                             <div id="project_id">
-                                <label class="form-label">รหัสโปรเจค</label>
-                                <input type="text" class="form-control" name="project_id" id="project_id" value="<?php echo isset($data['project_id']) ? $data['project_id'] : ''; ?>" placeholder="25xx-xxx">
+                                <label class="form-label">รหัสโปรเจค<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="project_id" id="project_id" value="<?php echo isset($data['project_id']) ? $data['project_id'] : ''; ?>" placeholder="รหัสโปรเจค" required>
                             </div>
 
                             <div id="room_number">
-                                <label class="form-label">ห้องสอบ</label>
-                                <input type="text" class="form-control" name="room_number" id="room_number" value="<?php echo isset($data['room_number']) ? $data['room_number'] : ''; ?>" placeholder="xxxxx">
+                                <label class="form-label">ห้องสอบ<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="room_number" id="room_number" value="<?php echo isset($data['room_number']) ? $data['room_number'] : ''; ?>" placeholder="ห้องสอบ" required>
                             </div>
 
                             <div id="timeTest_date">
-                                <label class="form-label">วันที่สอบ</label>
-                                <input type="date" class="form-control" name="timeTest_date" id="timeTest_date" value="<?php echo isset($data['timeTest_date']) ? $data['timeTest_date'] : ''; ?>" placeholder="yyyy-mm-dd">
+                                <label class="form-label">วันที่สอบ<span style="color: red;"> *</span></label>
+                                <input type="date" class="form-control" name="timeTest_date" id="timeTest_date" value="<?php echo isset($data['timeTest_date']) ? $data['timeTest_date'] : ''; ?>" placeholder="yyyy-mm-dd" required>
                             </div>
 
                             <div id="start_time">
-                                <label class="form-label">เริ่มสอบ</label>
-                                <input type="time" class="form-control" name="start_time" id="start_time" value="<?php echo isset($data['start_time']) ? $data['start_time'] : ''; ?>" placeholder="xx:xx">
+                                <label class="form-label">เริ่มสอบ<span style="color: red;"> *</span></label>
+                                <input type="time" class="form-control" name="start_time" id="start_time" value="<?php echo isset($data['start_time']) ? $data['start_time'] : ''; ?>" placeholder="xx:xx" required>
                             </div>
 
                             <div id="stop_time">
-                                <label class="form-label">หมดเวลาสอบ</label>
-                                <input type="time" class="form-control" name="stop_time" id="stop_time" value="<?php echo isset($data['stop_time']) ? $data['stop_time'] : ''; ?>" placeholder="xx:xx">
+                                <label class="form-label">หมดเวลาสอบ<span style="color: red;"> *</span></label>
+                                <input type="time" class="form-control" name="stop_time" id="stop_time" value="<?php echo isset($data['stop_time']) ? $data['stop_time'] : ''; ?>" placeholder="xx:xx" required>
                             </div>
 
                             <div class="pt-3 justify-content-center">

@@ -2,10 +2,11 @@
 session_start();
 require_once "../connect.php";
 
-// if (!isset($_SESSION['admin_login'])) {
-//   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
-//   header('Location: ../index.php');
-// }
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
 
 //                                   delete data
 if (isset($_GET['delete'])) {
@@ -15,7 +16,7 @@ if (isset($_GET['delete'])) {
   $deletestmt->execute();
   if ($deletestmt) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./TimeTestmanage.php");
   }
 }
@@ -70,31 +71,31 @@ if (isset($_GET['delete'])) {
 
 
               <div id="timeTest_date">
-                <label class="form-label">วันที่สอบ</label>
-                <input type="date" class="form-control" name="timeTest_date" id="timeTest_date" placeholder="yyyy-mm-dd">
+                <label class="form-label">วันที่สอบ<span style="color: red;"> *</span></label>
+                <input type="date" class="form-control" name="timeTest_date" id="timeTest_date" placeholder="yyyy-mm-dd" required>
               </div>
 
 
 
 
               <div id="start_time">
-                <label class="form-label">เริ่มสอบ</label>
-                <input type="time" class="form-control" name="start_time" id="start_time" value="<?php echo isset($_POST['start_time']) ?  $_POST['start_time'] : '' ?>" placeholder="xx:xx">
+                <label class="form-label">เวลาเริ่มสอบ<span style="color: red;"> *</span></label>
+                <input type="time" class="form-control" name="start_time" id="start_time" value="<?php echo isset($_POST['start_time']) ?  $_POST['start_time'] : '' ?>" placeholder="เวลาเริ่มสอบ" required>
               </div>
 
               <div id="stop_time">
-                <label class="form-label">หมดเวลาสอบ</label>
-                <input type="time" class="form-control" name="stop_time" id="stop_time" placeholder="xx:xx">
+                <label class="form-label">หมดเวลาสอบ<span style="color: red;"> *</span></label>
+                <input type="time" class="form-control" name="stop_time" id="stop_time" placeholder="หมดเวลาสอบ" required>
               </div>
 
               <div id="room_number">
-                <label class="form-label">ห้องสอบ</label>
-                <input type="text" class="form-control" name="room_number" id="room_number" placeholder="xxxxx">
+                <label class="form-label">ห้องสอบ<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="room_number" id="room_number" placeholder="ห้องสอบ" required>
               </div>
 
               <div id="project_id">
-                <label class="form-label">รหัสโปรเจค</label>
-                <input type="text" class="form-control" name="project_id" id="project_id" placeholder="25xx-xxx">
+                <label class="form-label">รหัสโครงงาน<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="project_id" id="project_id" placeholder="รหัสโครงงาน" required>
               </div>
           </div>
 
@@ -158,7 +159,7 @@ if (isset($_GET['delete'])) {
                     <tr>
                       <th class="text-center" scope="col" style="width : 5em;">ลำดับที่</th>
                       <!-- <th scope="col">timeTest_id</th> -->
-                      <th scope="col">รหัสโปรเจค</th>
+                      <th scope="col">รหัสโครงงาน</th>
                       <th scope="col">ห้องสอบ</th>
                       <th scope="col">วันที่สอบ</th>
                       <th scope="col">เริ่มสอบ</th>

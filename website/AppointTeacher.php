@@ -22,11 +22,11 @@ function convertToBuddhistEra($datetime)
 }
 function giveGroupById($conn, $group_id)
 {
-    $sql = "SELECT * FROM `groups` WHERE group_id = :group_id";
+    $sql = "SELECT group_name FROM `groups` WHERE group_id = :group_id";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':group_id', $group_id);
     $stmt->execute();
-    return $stmt->fetch();
+    return $stmt->fetchColumn();
 }
 $sql = "SELECT * FROM `teacher`";
 $stmt = $conn->prepare($sql);
@@ -55,18 +55,13 @@ foreach ($teacherdatas as $teacherdata) {
         $description = !empty($appointdata['description']) ? $appointdata['description'] : '';
         $appoint_date = !empty($appointdata['appoint_date']) ? $appointdata['appoint_date'] : '';
         
-
-        if (isset($appointdata['group_id'])) {
-            $group_id = giveGroupById($conn, $appointdata['group_id']);
-        } else {
-            $group_id = 'ทุกกลุ่มเรียน';
-        }
+        $group_id = (!empty($appointdata['group_id'])) ? giveGroupById($conn, $appointdata['group_id']) : 'ทุกกลุ่มเรียน';
         
         $to = $teacherdata['email'];
         $subject = "แจ้งเตือนกำหนดการ : " . $title;
         $message = "<html><body>";
         $message .= "<h2>หัวข้อกำหนดการ : " . $title . "</h2>";
-        $message .= "<p>กลุ่มเรียน : " . $group_id['group_name'] . "</p>";
+        $message .= "<p>กลุ่มเรียน : " . $group_id . "</p>";
         $message .= "<p>เนื้อหากำหนดการ : " . $description . "</p>";
         $message .= "<p>วันเวลาที่สิ้นสุดกำหนดการ(YYYY-MM-DD hh:mm:ss) : " . $appoint_date . "</p>";
         $message .= "</body></html>";

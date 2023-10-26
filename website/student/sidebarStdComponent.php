@@ -84,7 +84,7 @@
       </li>
 
       <li class="nav-item pb-2">
-        <a href="../logout_Std.php" id="logout" class="nav-link active">
+        <a href="../logout_Std.php" id="logoutLink" class="nav-link active">
           <div class="d-flex align-items-center">
             <div class="flex-grow">
               <i class="bi bi-box-arrow-right h4"></i>

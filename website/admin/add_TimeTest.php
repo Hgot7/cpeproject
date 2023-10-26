@@ -27,6 +27,18 @@ if (isset($_POST['submit'])) {
   $inputroom_number = empty($inputroom_number) ? null : $inputroom_number;
   $inputproject_id = empty($inputproject_id) ? null : $inputproject_id;
 
+  
+  $stmt = $conn->prepare("SELECT * FROM `timetest` WHERE project_id = :project_id");
+  $stmt->bindParam(':project_id', $inputproject_id);
+  $stmt->execute();
+  $project_iddata = $stmt->fetch(PDO::FETCH_ASSOC);
+
+  if (!empty($project_iddata)) {
+    $_SESSION['error'] = 'รหัสโครงงานนี้มีข้อมูลเวลาสอบในระบบอยู่แล้ว';
+    header('location: TimeTestmanage.php');
+    exit;
+  }
+
 
   if (empty($inputproject_id)) {
     $_SESSION['error'] = 'กรุณากรอก รหัสโครงงาน';

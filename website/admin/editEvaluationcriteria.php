@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $evaluationcriteria_start = $_POST['evaluationcriteria_start'];
@@ -30,9 +36,6 @@ if (isset($_POST['update'])) {
 }
 
 ?>
-
-
-
 <!DOCTYPE html>
 
 <head>
@@ -116,7 +119,8 @@ if (isset($_POST['update'])) {
 
                                         .label {
                                             font-weight: bold;
-                                            margin-right: 10px;
+                                            align-items: center;
+                                            align-content: center;
                                         }
 
                                         .input-container {
@@ -127,18 +131,18 @@ if (isset($_POST['update'])) {
                                         }
 
                                         .input-container input {
-                                            margin-right: 10px;
                                             width: 100%;
                                             /* ให้ input ยืดตามขนาดของ container */
                                         }
 
                                         .grade {
-                                            margin-left: 10px;
+                                            margin-left: 2em;
+                                           width: 5em;
+                                           text-align: start;
+
                                         }
 
-                                        .btn-container {
-                                            margin-top: 10px;
-                                        }
+
                                     </style>
 
                                     <form action="./editEvaluationcriteria.php" method="post" enctype="multipart/form-data">
@@ -146,13 +150,13 @@ if (isset($_POST['update'])) {
                                         <div class="form-container">
                                             <div class="label">คะแนน</div>
                                             <div class="input-container">
-                                                <input type="number" class="form-control" name="evaluationcriteria_start" placeholder="คะแนนเริ่มต้นของช่วงเกณฑ์การประเมิน" required value="<?php echo $data['evaluationcriteria_start']; ?>">
+                                                <input type="number" class="form-control" name="evaluationcriteria_start" required placeholder="คะแนนเริ่มต้นของช่วงเกณฑ์การประเมิน" required value="<?php echo $data['evaluationcriteria_start']; ?>">
                                             </div>
                                             <div class="label">ถึง</div>
                                             <div class="input-container">
-                                                <input type="number" class="form-control" name="evaluationcriteria_end" placeholder="คะแนนสิ้นสุดของช่วงเกณฑ์การประเมิน" required value="<?php echo $data['evaluationcriteria_end']; ?>">
+                                                <input type="number" class="form-control" name="evaluationcriteria_end" required placeholder="คะแนนสิ้นสุดของช่วงเกณฑ์การประเมิน" required value="<?php echo $data['evaluationcriteria_end']; ?>">
                                             </div>
-                                            <div class="grade"><?php echo "เกรด " . $data['grade']; ?></div>
+                                            <div class="grade label"><?php echo "เกรด " . $data['grade']; ?></div>
                                             <div class="btn-container">
                                                 <button type="submit" name="update" class="btn btn-success">อัปเดต</button>
                                             </div>

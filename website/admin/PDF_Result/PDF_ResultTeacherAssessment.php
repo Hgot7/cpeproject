@@ -14,27 +14,39 @@ function giveTeacherById($conn, $teacher_id)
 }
 
 function giveTeacherPositionById($Position)
-{
-    switch ($Position) {
-        case "รองศาสตราจารย์":
-            return $Position = "รศ.";
-            break;
-        case "ผู้ช่วยศาสตราจารย์":
-            return $Position = "ผศ.";
-            break;
-        case "ผู้ช่วยศาสตราจารย์ ดร.":
-            return $Position = "ผศ.ดร.";
-            break;
-        case "อาจารย์":
-            return $Position = "อ.";
-            break;
-        case "ดร.":
-            return $Position = "ดร.";
-            break;
-        default:
-            return $Position = $Position;
-    }
-}
+                      {
+                        switch ($Position) {
+                          case "ศาสตราจารย์":
+                            return $Position = "ศ.";
+                            break;
+                          case "ศาสตราจารย์ ดร.":
+                            return $Position = "ศ.ดร.";
+                            break;
+                          case "รองศาสตราจารย์":
+                            return $Position = "รศ.";
+                            break;
+                          case "รองศาสตราจารย์ ดร.":
+                            return $Position = "รศ.ดร.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์":
+                            return $Position = "ผศ.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์ ดร.":
+                            return $Position = "ผศ.ดร.";
+                            break;
+                          case "อาจารย์":
+                            return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
+                          case "ดร.":
+                            return $Position = "ดร.";
+                            break;
+                          default:
+                            return $Position = $Position;
+                        }
+                      }
 
 
 function giveStatusById($conn, $project_id, $teacherId)
@@ -149,8 +161,8 @@ $pdf->SetFillColor(255, 255, 255);
 $pdf->Cell(15, 20, "ลำดับที่", 1, 0, 'C');
 $pdf->Cell(25, 20, "รหัสโครงงาน", 1, 0, 'C');
 $pdf->MultiCell(45, 20, "ชื่อโครงงาน", 1, 'C', 1, 0, '', '', true, 0, false, true, 20, 'M');
-$pdf->MultiCell(45, 20, "ชื่ออาจารย์ที่ไม่ประเมิน", 1, 'C', 1, 0, '', '', true, 0, false, true, 20, 'M');
-$pdf->Cell(60, 20, "ส่วนที่ไม่ประเมิน", 1, 1, 'C');
+$pdf->MultiCell(55, 20, "ชื่ออาจารย์ที่ยังประเมินไม่ครบ", 1, 'C', 1, 0, '', '', true, 0, false, true, 20, 'M');
+$pdf->Cell(50, 20, "ส่วนที่ยังไม่ได้ประเมิน", 1, 1, 'C');
 // $pdf->Cell(79, 40, mb_substr($data['project_nameTH'], 0, 20), 1, 0, 'C');
 // $pdf->Cell(26, 40, iconv('utf-8', 'cp874', mb_substr($data['project_nameTH'], 0, 20)), 1, 0, 'C');
 // $pdf->Cell(79, 40, $data['project_nameTH'], 1, 0, 'C');
@@ -198,8 +210,8 @@ if (isset($_POST['data'])) {
             $pdf->Cell(15, 40, iconv('utf-8', 'cp874', $index), 1, 0, 'C');
             $pdf->MultiCell(25, 40, $project->project_id, 1, 'C', 1, 0, '', '', true, 0, false, true, 40, 'M');
             $pdf->MultiCell(45, 40, $project->project_nameTH, 1, 'C', 1, 0, '', '', true, 0, false, true, 40, 'M');
-            $pdf->MultiCell(45, 40, giveTeacherPositionById($teacherName['position']) . $teacherName['firstname'], 1, 'C', 1, 0, '', '', true, 0, false, true, 40, 'M');
-            $pdf->MultiCell(60, 40, giveStatusNameById($conn, $project->project_id, $data), 1, 'C', 1, 1, '', '', true, 0, false, true, 40, 'M');
+            $pdf->MultiCell(55, 40, giveTeacherPositionById($teacherName['position']) . $teacherName['firstname'], 1, 'C', 1, 0, '', '', true, 0, false, true, 40, 'M');
+            $pdf->MultiCell(50, 40, giveStatusNameById($conn, $project->project_id, $data), 1, 'C', 1, 1, '', '', true, 0, false, true, 40, 'M');
         }
 
         // $pdf->Cell(79, 40, $projectName, 1, 0, 'C');

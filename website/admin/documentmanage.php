@@ -2,11 +2,17 @@
 session_start();
 require_once "../connect.php";
 
-// if (!isset($_SESSION['admin_login'])) {
-//   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
-//   header('Location: ../index.php');
-// }
-
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
+if (isset($_SESSION['selectedYear'])) {
+  unset($_SESSION['selectedYear']);
+}
+if (isset($_SESSION['selectedTerm'])) {
+  unset($_SESSION['selectedTerm']);
+}
 //                                   delete data
 if (isset($_GET['delete'])) {
   $delete_id = $_GET['delete'];
@@ -40,7 +46,7 @@ if (isset($_GET['delete'])) {
   $deletestmt = $conn->prepare("DELETE FROM `document` WHERE document_id = :delete_id");
   $deletestmt->bindParam(':delete_id', $delete_id);
   if ($deletestmt->execute()) {
-    $_SESSION['success'] = "ลบข้อมูลเสร็จสมบูรณ์";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("location: ./documentmanage.php");
     exit;
   } else {
@@ -104,25 +110,25 @@ if (isset($_GET['delete'])) {
               $data = $stmt->fetch(PDO::FETCH_ASSOC);
               ?>
               <div id="document_path">
-                <label class="form-label">เอกสารในรายวิชา</label>
-                <input type="file" class="form-control" name="document_path" id="idocument_path" placeholder="ที่อยู่ไฟล์" accept=".pdf,.docx">
+                <label class="form-label">เอกสารในรายวิชา<span style="color: red;"> *</span></label>
+                <input type="file" class="form-control" name="document_path" id="idocument_path" placeholder="ไฟล์เอกสารในรายวิชา" accept=".pdf,.docx" required>
               </div>
 
               <div id="topic_section">
-                <label class="form-label">ชื่อเอกสารในรายวิชา</label>
+                <label class="form-label">ชื่อเอกสารในรายวิชา<span style="color: red;"> *</span></label>
                 <input type="text" class="form-control" name="document_name" id="document_name" value="<?php if (isset($_POST['document_name'])) {
                                                                                                           echo $_POST['document_name'];
-                                                                                                        } ?>" placeholder="ชื่อเอกสารในรายวิชา">
+                                                                                                        } ?>" placeholder="ชื่อเอกสารในรายวิชา" required>
               </div>
 
               <div id="year">
-                <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน</label>
-                <input type="number" class="form-control" name="year" id="year" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="25xx">
+                <label class="form-label">ปีการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="year" id="year" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษาที่เริ่มใช้งาน" required>
               </div>
 
               <div id="term">
-                <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน</label>
-                <select name="term" class="form-select">
+                <label class="form-label">ภาคการศึกษาที่เริ่มใช้งาน<span style="color: red;"> *</span></label>
+                <select name="term" class="form-select" required>
                   <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -172,23 +178,41 @@ if (isset($_GET['delete'])) {
           <div class="card shadow-sm">
             <div class="card-header justify-content-between align-items-center">
 
-            <form action="./documentmanage.php" method="POST">
+              <form action="./documentmanage.php" method="POST">
                 <div class="row g-3 mb-2">
 
                   <div class="col-md-2">
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                      if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+                        unset($_SESSION['selectedGroup']);
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+                        $selectedGroup = $_SESSION['selectedGroup'];
+                      }
                       $years = $conn->query("SELECT DISTINCT year FROM `document` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
+                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                        $yearValue = $datayear['year'];
+                        $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                          <?php echo $yearValue; ?>
                         </option>
                       <?php } ?>
+
                     </select>
                   </div>
 
@@ -198,12 +222,16 @@ if (isset($_GET['delete'])) {
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `document` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
+                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                        $termValue = $dataterm['term'];
+                        $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                          <?php echo $termValue; ?>
                         </option>
                       <?php } ?>
                     </select>
@@ -211,6 +239,10 @@ if (isset($_GET['delete'])) {
 
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                  </div>
+
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                   </div>
                 </div>
               </form>
@@ -225,6 +257,8 @@ if (isset($_GET['delete'])) {
                 <div class="col-auto">
                   <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-whatever="@mdo">เพิ่มข้อมูลเอกสารในรายวิชา</button>
                 </div>
+
+
               </div>
 
             </div>
@@ -247,7 +281,7 @@ if (isset($_GET['delete'])) {
                     </tr>
                   <tbody>
                     <?php
-                     if (isset($_POST['submitfilter'])) {
+                    if (isset($_POST['submitfilter'])) {
                       $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
                       $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
 
@@ -320,7 +354,7 @@ if (isset($_GET['delete'])) {
                           </tr>
                         <?php }
                       }
-                    }elseif (isset($_POST['submitsearch'])) {
+                    } elseif (isset($_POST['submitsearch'])) {
                       $SearchText = $_POST['search'];
                       $sql = "SELECT * FROM `document`
                       WHERE document_name LIKE :inputText";

@@ -1,6 +1,12 @@
 <?php
 session_start();
 require_once "../connect.php";
+
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -195,7 +201,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -309,7 +315,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -422,7 +428,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -535,7 +541,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -645,7 +651,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -756,7 +762,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -867,7 +873,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -978,7 +984,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1088,7 +1094,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1199,7 +1205,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1313,7 +1319,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1424,7 +1430,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1538,7 +1544,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">
@@ -1646,7 +1652,7 @@ require_once "../connect.php";
                                                         <?php endif; ?>
 
                                                         <a>
-                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัพโหลดล่าสุด" : "ไฟล์ที่อัพโหลดไว้แล้ว"; ?>
+                                                            <?php echo ($i == 1) ? "ไฟล์ที่อัปโหลดล่าสุด" : "ไฟล์ที่อัปโหลดไว้แล้ว"; ?>
                                                         </a>
 
                                                         <a href="<?php echo '.././student/fileUpload/' . $filePath; ?>" target="_blank">

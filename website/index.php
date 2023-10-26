@@ -5,27 +5,39 @@ require_once "connect.php";
 
 //ตำแหน่งท่านอาจารย์ 
 function giveTeacherPositionById($Position)
-{
-  switch ($Position) {
-    case "รองศาสตราจารย์":
-      return $Position = "รศ.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์":
-      return $Position = "ผศ.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์ ดร.":
-      return $Position = "ผศ.ดร.";
-      break;
-    case "อาจารย์":
-      return $Position = "อ.";
-      break;
-    case "ดร.":
-      return $Position = "ดร.";
-      break;
-    default:
-      return $Position = $Position;
-  }
-}
+                      {
+                        switch ($Position) {
+                          case "ศาสตราจารย์":
+                            return $Position = "ศ.";
+                            break;
+                          case "ศาสตราจารย์ ดร.":
+                            return $Position = "ศ.ดร.";
+                            break;
+                          case "รองศาสตราจารย์":
+                            return $Position = "รศ.";
+                            break;
+                          case "รองศาสตราจารย์ ดร.":
+                            return $Position = "รศ.ดร.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์":
+                            return $Position = "ผศ.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์ ดร.":
+                            return $Position = "ผศ.ดร.";
+                            break;
+                          case "อาจารย์":
+                            return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
+                          case "ดร.":
+                            return $Position = "ดร.";
+                            break;
+                          default:
+                            return $Position = $Position;
+                        }
+                      }
 
 // ตรวจสอบ cookie มีอยู่หรือไม่
 if (isset($_COOKIE['user_loginbuffer']) && isset($_COOKIE['user_passwordbuffer'])) {

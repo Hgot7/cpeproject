@@ -2,10 +2,30 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
+  
+
 if (isset($_POST['update'])) {
     $id = $_POST['id'];
     $year = $_POST['year'];
     $term = $_POST['term'];
+
+    if (empty($year)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: editDefaultSystem.php");
+        exit();
+      }
+    
+      if (empty($term)) {
+        $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+        header("location: editDefaultSystem.php");
+        exit();
+      }
 
     try {
         $sql = $conn->prepare("UPDATE `defaultsystem` SET year = :year, term = :term WHERE default_system_id = :id");
@@ -116,13 +136,13 @@ if (isset($_POST['update'])) {
                             <input type="hidden" name="id" value="<?php echo $data['default_system_id']; ?>">
 
                             <div class="pt-3 justify-content-center">
-                                <label class="form-label">ปีการศึกษาพื้นฐานของระบบ</label>
-                                <input type="number" class="form-control" name="year" placeholder="ปีการศึกษาพื้นฐานของระบบ" required value="<?php echo $data['year']; ?>">
+                            <label class="form-label">ปีการศึกษาพื้นฐานของระบบ<span style="color: red;"> *</span></label>
+                                <input type="number" class="form-control" name="year" style="width:auto;"placeholder="ปีการศึกษาพื้นฐานของระบบ" required value="<?php echo $data['year']; ?>">
                             </div>
 
                             <div id="term">
-                                <label class="form-label">ภาคการศึกษาพื้นฐานของระบบ</label>
-                                <select id="selectbox" name="term" class="form-select">
+                                <label class="form-label">ภาคการศึกษาพื้นฐานของระบบ<span style="color: red;"> *</span></label>
+                                <select id="selectbox" name="term" class="form-select" required>
                                 <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                                     <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                                     <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>

@@ -2,10 +2,12 @@
 
 session_start();
 require_once "../connect.php";
-// if (!isset($_SESSION['admin_login'])) {
-//     $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
-//     header('Location: ../index.php');
-// }
+
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -48,7 +50,7 @@ require_once "../connect.php";
                 <h1 class="h2" style="font-family: 'IBM Plex Sans Thai', sans-serif;">อัปโหลดไฟล์ CSV และบันทึกลงในฐานข้อมูล</h1>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb fs-5 mt-3 ms-3">
-                    <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
+                        <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
                         <li class="breadcrumb-item active" aria-current="page">อัปโหลดไฟล์ CSV</li>
                     </ol>
                 </nav>
@@ -78,18 +80,18 @@ require_once "../connect.php";
                     <div class="card-header border-success d-flex justify-content-between align-items-center">
                         <div class="col align-self-start">
                             อัปโหลดไฟล์ CSV. ในส่วนของรายชื่อนักศึกษา
-                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตรายชื่อนักศึกษาที่ลงทะเบียนรายวิชาโปรเจค.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตรายชื่อนักศึกษาที่ลงทะเบียนรายวิชาโปรเจค.xlsx</a>
+                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตรายชื่อนักศึกษาที่ลงทะเบียนรายวิชาโปรเจค.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตรายชื่อนักศึกษาที่ลงทะเบียนรายวิชาโครงงาน.xlsx</a>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="formFileMultiple" class="text-danger">*เฉพาะไฟล์นามสกุล .CSV เท่านั้น</label>
-                            <form action="./CSV_import/uploadStudent.php" method="post" enctype="multipart/form-data">
+                            <form action="./CSV_import/uploadStudent.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form1')">
                                 <div class="col-md3">
                                     <div class="input-group flex-nowrap">
                                         <input class="form-control" type="file" name="file" accept=".csv" id="formFileMultiple" multiple></input>
                                         <span class="input-group-text">ปีการศึกษา</span>
-                                        <input type="number" class="form-control" name="numberYear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="25xx" style="width: 5em;">
+                                        <input type="number" class="form-control" name="numberYear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษาที่ลงทะเบียน" style="width: 5em;">
                                         <span class="input-group-text">ภาคการศึกษา</span>
                                         <!-- <input type="text" class="form-control" name="numberTerm" placeholder="1 or 2 or 3"> -->
 
@@ -117,6 +119,12 @@ require_once "../connect.php";
                                         </select>
                                         <button type="submit" class="btn btn-primary">อัปโหลด</button>
                                     </div>
+                                    <div class="loading-overlay mt-2" id="form1-loadingOverlay" style="display: none;">
+                                        <div class="d-flex align-items-center text-center">
+                                            <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                                            <div class="spinner-border text-primary ms-3" role="status"></div>
+                                        </div>
+                                    </div>
 
                                 </div>
                             </form>
@@ -129,13 +137,13 @@ require_once "../connect.php";
                     <div class="card-header border-success d-flex justify-content-between align-items-center">
                         <div class="col align-self-start">
                             อัปโหลดไฟล์ CSV. ในส่วนของกำหนดการในรายวิชา
-                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตกำหนดการในรายวิชา.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตกำหนดการในรายวิชา.xlsx</a>
+                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตกำหนดการในรายวิชา.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตกำหนดการในรายวิชาโครงงาน.xlsx</a>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="formFileMultiple" class="text-danger">*เฉพาะไฟล์นามสกุล .CSV เท่านั้น</label>
-                            <form action="./CSV_import/uploadappoint.php" method="post" enctype="multipart/form-data">
+                            <form action="./CSV_import/uploadappoint.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form2')">
                                 <div class="input-group flex-nowrap">
                                     <input class="form-control" type="file" name="file" accept=".csv" id="formFileMultiple" multiple></input>
                                     <span class="input-group-text">กลุ่มเรียน</span>
@@ -155,6 +163,12 @@ require_once "../connect.php";
                                     </select>
                                     <button type="submit" class="btn btn-primary">อัปโหลด</button>
                                 </div>
+                                <div class="loading-overlay mt-2" id="form2-loadingOverlay" style="display: none;">
+                                    <div class="d-flex align-items-center text-center">
+                                        <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                                        <div class="spinner-border text-primary ms-3" role="status"></div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
 
@@ -164,14 +178,14 @@ require_once "../connect.php";
                 <div class="card shadow-sm mb-3" id="card_CSV">
                     <div class="card-header border-success d-flex justify-content-between align-items-center">
                         <div class="col align-self-start">
-                            อัปโหลดไฟล์ CSV. ในส่วนของข้อมูลโปรเจค
-                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตข้อมูลกลุ่มโปรเจค.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตข้อมูลกลุ่มโปรเจค.xlsx</a>
+                            อัปโหลดไฟล์ CSV. ในส่วนของข้อมูลโครงงาน
+                            <a href="<?php echo './CSV_import/templateCSV/เทมเพลตข้อมูลกลุ่มโปรเจค.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตข้อมูลกลุ่มโครงงาน.xlsx</a>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="formFileMultiple" class="text-danger">*เฉพาะไฟล์นามสกุล .CSV เท่านั้น</label>
-                            <form action="./CSV_import/uploadProject.php" method="post" enctype="multipart/form-data">
+                            <form action="./CSV_import/uploadProject.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form3')">
                                 <div class="input-group flex-nowrap">
                                     <input class="form-control" type="file" name="file" accept=".csv" id="formFileMultiple" multiple></input>
                                     <span class="input-group-text">กลุ่มเรียน</span>
@@ -191,7 +205,12 @@ require_once "../connect.php";
                                     </select>
                                     <!-- <input type="text" class="form-control" name="numberTerm" placeholder="1 or 2 or 3"> -->
                                     <button type="submit" class="btn btn-primary">อัปโหลด</button>
-                   
+                                </div>
+                                <div class="loading-overlay mt-2" id="form3-loadingOverlay" style="display: none;">
+                                    <div class="d-flex align-items-center text-center">
+                                        <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                                        <div class="spinner-border text-primary ms-3" role="status"></div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -202,17 +221,23 @@ require_once "../connect.php";
                 <div class="card shadow-sm mb-3" id="card_CSV">
                     <div class="card-header border-success d-flex justify-content-between align-items-center">
                         <div class="col align-self-start">
-                            อัปโหลดไฟล์ CSV. ในส่วนของเวลาสอบโปรเจค
+                            อัปโหลดไฟล์ CSV. ในส่วนของเวลาสอบโครงงาน
                             <a href="<?php echo './CSV_import/templateCSV/เทมเพลตข้อมูลเวลาสอบโครงงาน.xlsx'; ?>" target="_blank" rel="noopener noreferrer">เทมเพลตข้อมูลเวลาสอบโครงงาน.xlsx</a>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="formFileMultiple" class="text-danger">*เฉพาะไฟล์นามสกุล .CSV เท่านั้น</label>
-                            <form action="./CSV_import/uploadTimeTest.php" method="post" enctype="multipart/form-data">
+                            <form action="./CSV_import/uploadTimeTest.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form4')">
                                 <div class="col-md3">
                                     <input class="form-control" type="file" name="file" accept=".csv" id="formFileMultiple" multiple></input>
                                     <button type="submit" class="btn btn-primary">อัปโหลด</button>
+                                </div>
+                                <div class="loading-overlay mt-2" id="form4-loadingOverlay" style="display: none;">
+                                    <div class="d-flex align-items-center text-center">
+                                        <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                                        <div class="spinner-border text-primary ms-3" role="status"></div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -230,21 +255,27 @@ require_once "../connect.php";
                     <div class="card-body">
                         <div class="row mb-3">
                             <label for="formFileMultiple" class="text-danger">*เฉพาะไฟล์นามสกุล .CSV เท่านั้น</label>
-                            <form action="./CSV_import/uploadNews.php" method="post" enctype="multipart/form-data">
+                            <form action="./CSV_import/uploadNews.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form5')">
                                 <div class="input-group flex-nowrap">
                                     <input class="form-control" type="file" name="file" accept=".csv" id="formFileMultiple" multiple></input>
                                     <span class="input-group-text">ปีการศึกษา</span>
                                     <!-- <input type="text" class="form-control" name="numberYear" placeholder="25xx"> -->
-                                    <input type="number" class="form-control" name="numberYear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="25xx">
+                                    <input type="number" class="form-control" name="numberYear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษา">
                                     <span class="input-group-text">ภาคการศึกษา</span>
                                     <!-- <input type="text" class="form-control" name="numberTerm" placeholder="1 or 2 or 3"> -->
                                     <select id="selectbox" name="numberTerm" class="form-select">
-                                    <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
+                                        <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                                         <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                                         <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
                                         <option value="3" <?php if ($data['term'] == "3") echo 'selected'; ?>>3</option>
                                     </select>
                                     <button type="submit" class="btn btn-primary">อัปโหลด</button>
+                                </div>
+                                <div class="loading-overlay mt-2" id="form5-loadingOverlay" style="display: none;">
+                                    <div class="d-flex align-items-center text-center">
+                                        <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                                        <div class="spinner-border text-primary ms-3" role="status"></div>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -262,6 +293,21 @@ require_once "../connect.php";
 
     </div>
     </div>
+
+    <script>
+              // animetion uploading    
+      function showLoading(formId) {
+        // แสดง Popup Loading เฉพาะฟอร์มที่ถูกส่ง
+        document.getElementById(formId + "-loadingOverlay").style.display = "block";
+        return true; // ต้อง return true เพื่อให้ฟอร์มส่งข้อมูลไปยัง action
+      }
+
+      function hideLoading(formId) {
+        // ซ่อน Popup Loading เมื่ออัปโหลดสำเร็จ
+        document.getElementById(formId + "-loadingOverlay").style.display = "none";
+      }
+      
+    </script>
 
 </body>
 

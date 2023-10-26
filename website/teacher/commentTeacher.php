@@ -99,7 +99,7 @@ if (isset($_GET['fileId']) && isset($_POST['comment'])) {
                 $stmt->bindParam(':student_id', $data);
                 $stmt->execute();
                 $studentdata = $stmt->fetch(PDO::FETCH_ASSOC);
-
+                if(empty($studentdata['email'])){continue;}
                 $to = $studentdata['email'];
                 $subject = "อาจารย์ที่ปรึกษาแสดงความคิดเห็นกับ $file_chapter";
                 $message = "<html><body>";

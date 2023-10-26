@@ -60,7 +60,7 @@ if (!isset($_SESSION['teacher_login'])) {
                   <table class="table">
                     <thead>
                       <tr>
-                      <th scope="col" style="width: 5em;">ลำดับที่</th>
+                        <th scope="col" style="width: 5em;">ลำดับที่</th>
                         <th scope="col">กฎข้อบังคับ</th>
                         <th scope="col">เนื้อหากฎข้อบังคับเพิ่มเติม</th>
                       </tr>
@@ -175,7 +175,7 @@ if (!isset($_SESSION['teacher_login'])) {
                   <table class="table">
                     <thead>
                       <tr>
-                      <th scope="col" style="width: 5em;">ลำดับที่</th>
+                        <th scope="col" style="width: 5em;">ลำดับที่</th>
                         <th scope="col">รหัสโปรเจคที่สอบ</th>
                         <th scope="col">ชื่อโปรเจคที่สอบ</th>
                         <th scope="col">นักศึกษา 1</th>
@@ -244,6 +244,9 @@ if (!isset($_SESSION['teacher_login'])) {
                             break;
                           case "อาจารย์":
                             return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
                             break;
                           case "ดร.":
                             return $Position = "ดร.";
@@ -341,7 +344,7 @@ if (!isset($_SESSION['teacher_login'])) {
                   <table class="table">
                     <thead>
                       <tr>
-                      <th scope="col" style="width: 5em;">ลำดับที่</th>
+                        <th scope="col" style="width: 5em;">ลำดับที่</th>
                         <th scope="col">หัวข้อกำหนดการ</th>
                         <th scope="col">เนื้อหากำหนดการ</th>
                         <th scope="col">วันเวลาที่สิ้นสุดกำหนดการ</th>

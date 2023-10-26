@@ -18,7 +18,7 @@ if (isset($_GET['delete'])) {
     // รันคำสั่ง SQL
     if ($deletestmt->execute()) {
       echo "<script>alert('Data has been deleted successfully');</script>";
-      $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+      $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
       header("refresh:1; url=./groupmanage.php");
     }
   } catch (PDOException $e) {
@@ -75,10 +75,10 @@ if (isset($_GET['delete'])) {
           <div class="modal-body">
             <form action="./add_dataGroup.php" method="post" enctype="multipart/form-data">
               <div id="inputgroup_id">
-                <label class="form-label">ชื่อกลุ่มเรียน</label>
+                <label class="form-label">ชื่อกลุ่มเรียน<span style="color: red;"> *</span></label>
                 <input type="text" class="form-control" name="inputgroup_name" id="inputgroup_name" value="<?php if (isset($_POST['inputgroup_name'])) {
                                                                                                               echo $_POST['inputgroup_name'];
-                                                                                                            } ?>" placeholder="ชื่อกลุ่มเรียน">
+                                                                                                            } ?>" placeholder="ชื่อกลุ่มเรียน" required>
               </div>
           </div>
 

@@ -74,14 +74,30 @@ if (!isset($_SESSION['admin_login'])) {
                                         <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                                         <select class="form-select" name="filteryear">
                                             <?php
+                                            if (isset($_POST['resetfilter'])) {
+                                                unset($_SESSION['selectedYear']);
+                                                unset($_SESSION['selectedTerm']);
+                                                unset($_SESSION['selectedTeacher']);
+                                            }
+                                            if (isset($_POST['submitfilter'])) {
+                                                $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                                                $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                                                $_SESSION['selectedTeacher'] = isset($_POST['filterteacher']) ? $_POST['filterteacher'] : null;
+                                                $selectedYear =  $_SESSION['selectedYear'];
+                                                $selectedTerm =   $_SESSION['selectedTerm'];
+                                                $selectedTeacher = $_SESSION['selectedTeacher'];
+                                            }
                                             $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                                             $years->execute();
                                             ?>
                                             <option value="">เลือกปีการศึกษา</option>
                                             <?php
-                                            while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <option value="<?php echo $datayear['year']; ?>">
-                                                    <?php echo $datayear['year']; ?>
+                                            while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                                                $yearValue = $datayear['year'];
+                                                $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                                            ?>
+                                                <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                                                    <?php echo $yearValue; ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -96,9 +112,12 @@ if (!isset($_SESSION['admin_login'])) {
                                             ?>
                                             <option value="">เลือกภาคการศึกษา</option>
                                             <?php
-                                            while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <option value="<?php echo $dataterm['term']; ?>">
-                                                    <?php echo $dataterm['term']; ?>
+                                            while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                                                $termValue = $dataterm['term'];
+                                                $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                                            ?>
+                                                <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                                                    <?php echo $termValue; ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -111,21 +130,31 @@ if (!isset($_SESSION['admin_login'])) {
                                             <?php
                                             $teachers = $conn->query("SELECT * FROM `teacher`");
                                             $teachers->execute();
+                                            // $selectedTeacherId = isset($_SESSION['selectedTeacher']) ? $_SESSION['selectedTeacher'] : null;
                                             while ($teacher = $teachers->fetch(PDO::FETCH_ASSOC)) {
                                                 // ถ้า teacher_id เป็น 1 ให้ข้ามการแสดง option นี้ไป
                                                 if ($teacher['teacher_id'] == 1) {
                                                     continue;
                                                 }
-                                                echo '<option value="' . $teacher['teacher_id'] . '">';
+
+                                                $teacherId = $teacher['teacher_id'];
+                                                $selected = ($teacherId == $selectedTeacher) ? 'selected' : '';
+
+                                                echo '<option value="' . $teacherId . '" ' . $selected . '>';
                                                 echo $teacher['position'] . ' ' . $teacher['firstname'];
                                                 echo '</option>';
                                             }
                                             ?>
                                         </select>
+
                                     </div>
 
                                     <div class="col-auto d-flex align-items-end justify-content-start">
                                         <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                                    </div>
+
+                                    <div class="col-auto d-flex align-items-end justify-content-start">
+                                        <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                                     </div>
 
                                 </div>

@@ -29,6 +29,7 @@ try {
         } else {
             if (move_uploaded_file($_FILES["file"]["tmp_name"], $targetFile)) {
                 // อ่านข้อมูลจากไฟล์ CSV
+
                 $csvData = file_get_contents($targetFile);
                 $rows = explode("\n", $csvData);
                 $rows = preg_replace("/\r\n|\r|\n/", ' ', $rows);
@@ -37,7 +38,7 @@ try {
                 foreach ($rows as $row) {
                     $i++;
                     if ($i >= 2) {
-                        $data = str_getcsv($row); 
+                        $data = str_getcsv($row);
                         // $column1 เก็บ timeTest_date
                         $column1 = $data[0];
                         $testdate = explode("/", $column1);
@@ -55,13 +56,22 @@ try {
                             continue; // หยุดการทำงานของลูปและข้ามไปยังรอบถัดไป
                         }
 
+                        $stmt = $conn->prepare("SELECT * FROM `timetest` WHERE project_id = :project_id");
+                        $stmt->bindParam(':project_id', $column5);
+                        $stmt->execute();
+                        $project_iddata = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                        if (!empty($project_iddata)) {
+                            continue; // หยุดการทำงานของลูปและข้ามไปยังรอบถัดไป
+                        }
+
                         //เตรียมคำสั่ง SQL
                         $sql = "INSERT INTO `timetest`(timetest_date, start_time, stop_time, room_number, project_id) VALUES (:timetest_date,:start_time,:stop_time,:room_number,:project_id)";
 
                         // เรียกใช้คำสั่ง SQL
                         $stmt = $conn->prepare($sql);
-                        
-                      
+
+
                         $stmt->bindParam(':timetest_date', $column1);
                         $stmt->bindParam(':start_time', $column2);
                         $stmt->bindParam(':stop_time', $column3);
@@ -77,14 +87,13 @@ try {
                         }
                     }
                 }
-
-               
             }
-             // ลบไฟล์หลังจากบันทึกเสร็จ
-             unlink($targetFile);
-             $_SESSION['success'] = "บันทึกข้อมูลการสอบในรายวิชาสำเร็จ";
-             header("Location: ../uploadCSV.php");
-             exit();
+            // ลบไฟล์หลังจากบันทึกเสร็จ
+            unlink($targetFile);
+            $_SESSION['success'] = "บันทึกข้อมูลการสอบในรายวิชาสำเร็จ";
+            echo "<script>hideLoading();</script>"; // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
+            header("Location: ../uploadCSV.php");
+            exit();
         }
     }
 } catch (PDOException $e) {

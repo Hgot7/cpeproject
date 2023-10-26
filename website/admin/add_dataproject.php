@@ -24,59 +24,91 @@ if (isset($_POST['submit'])) {
     $uploadOk = 1;
     $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    if ($uploadOk == 1) {
-      // ดำเนินการตรวจสอบชื่อไฟล์ซ้ำ
-      $stmt = $conn->prepare("SELECT boundary_path FROM `project` WHERE boundary_path = :inputboundary_path");
-      $stmt->bindParam(':inputboundary_path', $inputboundary_path);
-      $stmt->execute();
-      $existingFile = $stmt->fetch(PDO::FETCH_ASSOC);
+    // ตรวจสอบชื่อไฟล์ที่ซ้ำกัน
+    if (file_exists($targetFile)) {
+        $filename = pathinfo($inputboundary_path, PATHINFO_FILENAME);
+        $file_extension = pathinfo($inputboundary_path, PATHINFO_EXTENSION);
 
-      if ($existingFile) {
-        $_SESSION['error'] = 'ชื่อไฟล์ซ้ำกันในระบบ ไม่สามารถอัปโหลดได้';
-        header('location: projectmanage.php');
-        exit;
-      } else {
-        if (move_uploaded_file($_FILES["inputboundary_path"]["tmp_name"], $targetFile)) {
-          // เพิ่มข้อมูลลงในฐานข้อมูล
-        } else {
-          $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
-          header('location: projectmanage.php');
-          exit;
+        $counter = 1;
+        while (file_exists($targetFile)) {
+            $inputboundary_path = $filename . '_' . $counter . '.' . $file_extension;
+            $targetFile = $targetDir . $inputboundary_path;
+            $counter++;
         }
-      }
-    } else {
-      $_SESSION['error'] = 'กรุณาเลือกไฟล์ใหม่ที่ต้องการอัปโหลด';
-      header('location: projectmanage.php');
-      exit;
     }
-  } else {
-    $inputboundary_path = ""; // กำหนดค่าเป็นค่าว่างเมื่อไม่มีไฟล์ถูกอัปโหลด
-  }
+
+    if (move_uploaded_file($_FILES["inputboundary_path"]["tmp_name"], $targetFile)) {
+        // เพิ่มข้อมูลลงในฐานข้อมูล
+    } else {
+        $_SESSION['error'] = 'ขออภัย, ไฟล์ไม่ได้ถูกอัปโหลด';
+        header('location: projectmanage.php');
+        $inputboundary_path = null;
+    }
+} 
+
 
   // $inputgrade = $_POST['inputgrade'];
   $inputyear = $_POST['inputyear'];
   $inputterm = $_POST['inputterm'];
 
   if (empty($inputproject_id)) {
-    $_SESSION['error'] = 'กรุณากรอก project_id';
+    $_SESSION['error'] = 'กรุณากรอกรหัสกลุ่มโครงงานนักศึกษา';
     header('location: projectmanage.php');
     exit;
-  } 
+  }
   if (empty($inputproject_nameTH)) {
-    $_SESSION['error'] = 'กรุณากรอก project_nameTH';
+    $_SESSION['error'] = 'กรุณากรอกชื่อโครงงานภาษาไทย';
     header('location: projectmanage.php');
     exit;
-  } 
-  if (empty($inputstudent_id1)) {$inputstudent_id1 = null;} 
-  if (empty($inputstudent_id2)) {$inputstudent_id2 = null;} 
-  if (empty($inputstudent_id3)) {$inputstudent_id3 = null; } 
-  if (empty($inputteacher_id1)) {$inputteacher_id1 = null;}
-  if (empty($inputteacher_id2)) {$inputteacher_id2 = null;}
-  if (empty($inputreferee_id)) {$inputreferee_id = null;}
-  if (empty($inputreferee_id1)) {$inputreferee_id1 = null;}
-  if (empty($inputreferee_id2)) {$inputreferee_id2 = null;}
-  if (empty($inputgroup_id)) {$inputgroup_id = null;}
-  if (empty($inputyear)) {$inputyear = null;}
+  }
+  if (empty($inputstudent_id1)) {
+    $inputstudent_id1 = null;
+  }
+  if (empty($inputstudent_id2)) {
+    $inputstudent_id2 = null;
+  }
+  if (empty($inputstudent_id3)) {
+    $inputstudent_id3 = null;
+  }
+  if (empty($inputteacher_id1)) {
+    $inputteacher_id1 = null;
+  }
+  if (empty($inputteacher_id2)) {
+    $inputteacher_id2 = null;
+  }
+  if (empty($inputreferee_id)) {
+    $inputreferee_id = null;
+  }
+  if (empty($inputreferee_id1)) {
+    $inputreferee_id1 = null;
+  }
+  if (empty($inputreferee_id2)) {
+    $inputreferee_id2 = null;
+  }
+  if (empty($inputgroup_id)) {
+    $inputgroup_id = null;
+  }
+  if (empty($inputyear)) {
+    $inputyear = null;
+  }
+
+
+  $student_ids = [$inputstudent_id1, $inputstudent_id2, $inputstudent_id3];
+  foreach ($student_ids as $student_id) {
+    if (empty($student_id)) {
+      continue;
+    }
+    $stmt = $conn->prepare("SELECT * FROM `project` WHERE student_id1 = :student_id or student_id2 = :student_id or student_id3 = :student_id");
+    $stmt->bindParam(':student_id', $student_id);
+    $stmt->execute();
+    $project_data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!empty($project_data)) {
+      $_SESSION['error'] = 'รหัสนักศึกษานี้มีข้อมูลโครงงานในระบบอยู่แล้ว';
+      header('Location: projectmanage.php');
+      exit;
+    }
+  }
 
   try {
     $stmt = $conn->prepare("INSERT INTO `project` (project_id, project_nameTH, project_nameENG, student_id1, student_id2, student_id3, teacher_id1, teacher_id2, referee_id, referee_id1, referee_id2, group_id, boundary_path, year, term) 
@@ -99,7 +131,7 @@ if (isset($_POST['submit'])) {
     $stmt->bindParam(':inputterm', $inputterm);
 
     if ($stmt->execute()) {
-      $_SESSION['success'] = 'เพิ่มข้อมูลรหัสกลุ่มโครงงาน '.$inputproject_id.' เสร็จสมบูรณ์!!';
+      $_SESSION['success'] = 'เพิ่มข้อมูลรหัสกลุ่มโครงงาน ' . $inputproject_id . ' เสร็จสมบูรณ์!!';
       header('location: projectmanage.php');
       exit;
     } else {
@@ -113,4 +145,3 @@ if (isset($_POST['submit'])) {
     exit;
   }
 }
-?>

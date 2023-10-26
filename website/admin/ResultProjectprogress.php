@@ -20,36 +20,39 @@ function giveTeacherById($conn, $teacher_id)
 }
 
 function giveTeacherPositionById($Position)
-{
-  switch ($Position) {
-    case "ศาสตราจารย์":
-      return $Position = "ศ.";
-      break;
-    case "ศาสตราจารย์ ดร.":
-      return $Position = "ศ.ดร.";
-      break;
-    case "รองศาสตราจารย์":
-      return $Position = "รศ.";
-      break;
-    case "รองศาสตราจารย์ ดร.":
-      return $Position = "รศ.ดร.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์":
-      return $Position = "ผศ.";
-      break;
-    case "ผู้ช่วยศาสตราจารย์ ดร.":
-      return $Position = "ผศ.ดร.";
-      break;
-    case "อาจารย์":
-      return $Position = "อ.";
-      break;
-    case "ดร.":
-      return $Position = "ดร.";
-      break;
-    default:
-      return $Position = $Position;
-  }
-}
+                      {
+                        switch ($Position) {
+                          case "ศาสตราจารย์":
+                            return $Position = "ศ.";
+                            break;
+                          case "ศาสตราจารย์ ดร.":
+                            return $Position = "ศ.ดร.";
+                            break;
+                          case "รองศาสตราจารย์":
+                            return $Position = "รศ.";
+                            break;
+                          case "รองศาสตราจารย์ ดร.":
+                            return $Position = "รศ.ดร.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์":
+                            return $Position = "ผศ.";
+                            break;
+                          case "ผู้ช่วยศาสตราจารย์ ดร.":
+                            return $Position = "ผศ.ดร.";
+                            break;
+                          case "อาจารย์":
+                            return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
+                          case "ดร.":
+                            return $Position = "ดร.";
+                            break;
+                          default:
+                            return $Position = $Position;
+                        }
+                      }
 
 
 ?>
@@ -131,14 +134,28 @@ function giveTeacherPositionById($Position)
                                         <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                                         <select class="form-select" name="filteryear">
                                             <?php
+                                            if (isset($_POST['resetfilter'])) {
+                                                unset($_SESSION['selectedYear']);
+                                                unset($_SESSION['selectedTerm']);
+                                            }
+                                            if (isset($_POST['submitfilter'])) {
+                                                $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                                                $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+
+                                                $selectedYear =  $_SESSION['selectedYear'];
+                                                $selectedTerm =   $_SESSION['selectedTerm'];
+                                            }
                                             $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                                             $years->execute();
                                             ?>
                                             <option value="">เลือกปีการศึกษา</option>
                                             <?php
-                                            while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <option value="<?php echo $datayear['year']; ?>">
-                                                    <?php echo $datayear['year']; ?>
+                                            while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                                                $yearValue = $datayear['year'];
+                                                $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                                            ?>
+                                                <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                                                    <?php echo $yearValue; ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -153,9 +170,12 @@ function giveTeacherPositionById($Position)
                                             ?>
                                             <option value="">เลือกภาคการศึกษา</option>
                                             <?php
-                                            while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <option value="<?php echo $dataterm['term']; ?>">
-                                                    <?php echo $dataterm['term']; ?>
+                                            while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                                                $termValue = $dataterm['term'];
+                                                $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                                            ?>
+                                                <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                                                    <?php echo $termValue; ?>
                                                 </option>
                                             <?php } ?>
                                         </select>
@@ -163,6 +183,10 @@ function giveTeacherPositionById($Position)
 
                                     <div class="col-auto d-flex align-items-end justify-content-start">
                                         <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                                    </div>
+                                    
+                                    <div class="col-auto d-flex align-items-end justify-content-start">
+                                        <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                                     </div>
                                 </div>
                             </form>
@@ -189,8 +213,8 @@ function giveTeacherPositionById($Position)
                                             $selected = '';
                                             if (isset($_POST['submitfilter'])) {
 
-                                                $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                                                $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                                                // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                                                // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
 
 
                                                 if (empty($selectedYear) && empty($selectedTerm)) {
@@ -294,7 +318,7 @@ function giveTeacherPositionById($Position)
                                                 $stmt->execute();
                                                 $datas = $stmt->fetchAll();
                                                 $index = 1;
-                                                $selected = 'โครงงานทั้งหมด';
+                                                $selected = 'โครงงานทั้งหมดในระบบ';
                                                 // ครับประกันว่า $datas มีข้อมูล
                                                 if (!$datas) {
                                                     echo "<p><td colspan='20' class='text-center'>No data available</td></p>";

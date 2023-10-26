@@ -83,7 +83,7 @@
       </li>
 
         <li class="nav-item pb-2">
-          <a href="../logout_Teacher.php" class="nav-link active" aria-current="page">
+          <a href="../logout_Teacher.php" class="nav-link active" aria-current="page" id="logoutLink">
             <div class="d-flex align-items-center">
               <div class="flex-grow">
                 <i class="bi bi-box-arrow-right h4"></i>

@@ -10,10 +10,10 @@ if (isset($_POST['submit'])) {
   $inputterm = $_POST['inputterm'];
 
   if (empty($inputnews_head)) {
-    $_SESSION['error'] = 'กรุณากรอก news_head';
+    $_SESSION['error'] = 'กรุณากรอก หัวข้อข่าวสาร';
     header('location: Newsmanage.php');
   } elseif (empty($inputnews_text)) {
-    $_SESSION['error'] = 'กรุณากรอก news_text';
+    $_SESSION['error'] = 'กรุณากรอก เนื้อหาข่าวสาร';
     header('location: Newsmanage.php');
   } else {
     $inputyear = empty($inputyear) ? null : $inputyear;

@@ -54,6 +54,7 @@ try {
             // ลบไฟล์ CSV หลังจากเสร็จสิ้นการอัปโหลด
             unlink($targetFile);
             $_SESSION['success'] = "บันทึกข้อมูลข่าวสารสำเร็จ";
+            echo "<script>hideLoading();</script>"; // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
         } else {
             $_SESSION['error'] = "ขออภัย ไม่สามารถอัปโหลดไฟล์ได้";
         }

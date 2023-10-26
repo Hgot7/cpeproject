@@ -5,8 +5,11 @@ require_once "../connect.php";
 if (!isset($_SESSION['admin_login'])) {
     $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
     header('Location: ../index.php');
+    exit();
 }
-
+if (isset($_SESSION['selectedGroup'])) {
+    unset($_SESSION['selectedGroup']);
+}
 //                                   delete data
 if (isset($_GET['delete'])) {
     $delete_id = $_GET['delete'];
@@ -15,7 +18,7 @@ if (isset($_GET['delete'])) {
     $deletestmt->execute();
     if ($deletestmt) {
         echo "<script>alert('Data has been deleted successfully');</script>";
-        $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+        $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
         header("refresh:1; url=./Appointmanage.php");
     }
 }
@@ -68,8 +71,8 @@ if (isset($_GET['delete'])) {
 
 
                             <div id="title">
-                                <label class="form-label">หัวข้อกำหนดการ</label>
-                                <input type="text" class="form-control" name="title" id="title" value="<?php echo isset($_POST['title']) ?  $_POST['title'] : '' ?>" placeholder="หัวข้อกำหนดการ">
+                                <label class="form-label">หัวข้อกำหนดการ<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="title" id="title" value="<?php echo isset($_POST['title']) ?  $_POST['title'] : '' ?>" placeholder="หัวข้อกำหนดการ" required>
                             </div>
 
                             <label class="form-label">เนื้อหากำหนดการ</label>
@@ -80,14 +83,14 @@ if (isset($_GET['delete'])) {
                             </div>
 
                             <div id="title">
-                                <label class="form-label">วันเวลาที่สิ้นสุดกำหนดการ</label>
-                                <input type="datetime-local" class="form-control" name="appoint_date" id="appoint_date" value="<?php echo isset($_POST['appoint_date']) ?  $_POST['appoint_date'] : '' ?>" placeholder="หัวข้อกำหนดการ">
+                                <label class="form-label">วันเวลาที่สิ้นสุดกำหนดการ<span style="color: red;"> *</span></label>
+                                <input type="datetime-local" class="form-control" name="appoint_date" id="appoint_date" value="<?php echo isset($_POST['appoint_date']) ?  $_POST['appoint_date'] : '' ?>" placeholder="หัวข้อกำหนดการ" required>
                             </div>
 
                             <div id="group_id">
-                                <label class="form-label">กลุ่มเรียน</label>
+                                <label class="form-label">กลุ่มเรียน<span style="color: red;"> *</span></label>
                                 <!-- <input type="text" class="form-control" name="group_id" id="group_id" placeholder="กลุ่มเรียนนักศึกษา"> -->
-                                <select id="selectbox" name="group_id" class="form-select">
+                                <select id="selectbox" name="group_id" class="form-select" >
                                     <option value="<?php echo null ?>">ทุกกลุ่มเรียน</option>
                                     <?php
                                     $groups = $conn->query("SELECT * FROM `groups` ORDER BY group_id DESC");
@@ -115,9 +118,8 @@ if (isset($_GET['delete'])) {
         </div>
 
         <main class="col-md-9 ml-sm-auto col-lg-10 px-md-3 py-3">
+
             <div class="row">
-
-
                 <h1 class="h2" style="font-family: 'IBM Plex Sans Thai', sans-serif;">ข้อมูลกำหนดการในรายวิชา</h1>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb fs-5 mt-2 ms-3">
@@ -150,6 +152,13 @@ if (isset($_GET['delete'])) {
                                         <label for="filtergroup" class="form-label">ฟิลเตอร์กลุ่มเรียน</label>
                                         <select class="form-select" name="filtergroup">
                                             <?php
+                                            if (isset($_POST['resetfilter'])) {
+                                                unset($_SESSION['selectedGroup']);
+                                            }
+                                            if (isset($_POST['submitfilter'])) {
+                                                $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                                                $selectedGroup = $_SESSION['selectedGroup'];
+                                            }
                                             $groups = $conn->prepare("SELECT groups.group_name 
                                             FROM `groups`
                                             LEFT JOIN `appoint` ON groups.group_id = appoint.group_id
@@ -157,14 +166,18 @@ if (isset($_GET['delete'])) {
                                             HAVING COUNT(appoint.group_id) >= 1
                                             ORDER BY groups.group_name DESC");
                                             $groups->execute();
+                                            $selectedGroup = isset($_SESSION['selectedGroup']) ? $_SESSION['selectedGroup'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables     
                                             ?>
                                             <option value="">ทุกกลุ่มเรียน</option>
                                             <?php
-                                            while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) { ?>
-                                                <option value="<?php echo $datagroup['group_name']; ?>">
-                                                    <?php echo $datagroup['group_name']; ?>
+                                              while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) {
+                                                $groupValue = $datagroup['group_name'];
+                                                $isGroupSelected = ($selectedGroup == $groupValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                                              ?>
+                                                <option value="<?php echo $groupValue; ?>" <?php echo $isGroupSelected; ?>>
+                                                  <?php echo $groupValue; ?>
                                                 </option>
-                                            <?php } ?>
+                                              <?php } ?>
                                         </select>
                                     </div>
 
@@ -172,6 +185,12 @@ if (isset($_GET['delete'])) {
                                     <div class="col-auto d-flex align-items-end justify-content-start">
                                         <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
                                     </div>
+
+                                    <div class="col-auto d-flex align-items-end justify-content-start">
+                                        <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
+                                    </div>
+
+
                                 </div>
                             </form>
 
@@ -272,9 +291,9 @@ if (isset($_GET['delete'])) {
                                             $SearchText = $_POST['search'];
                                             $sql = "SELECT * FROM `appoint`
                                             WHERE title LIKE :inputText";
-                                                          $stmt = $conn->prepare($sql);
-                                                          $stmt->bindParam(':inputText', $SearchText);
-                                                          $stmt->execute();
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->bindParam(':inputText', $SearchText);
+                                            $stmt->execute();
                                             $searchData = $stmt->fetchAll();
                                             $index = 1;
                                             if (!$searchData) {

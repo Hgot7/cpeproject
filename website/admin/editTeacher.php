@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['update'])) {
     $teacher_id = $_POST['id'];
     $New_teacher_username = $_POST['input_teacher_username'];
@@ -122,18 +128,18 @@ if (isset($_POST['update'])) {
                             <input type="hidden" name="id" value="<?php echo $data['teacher_id'] ?? ''; ?>">
 
                             <div class="pt-3 justify-content-center">
-                                <label class="form-label">รหัสประจำตัวอาจารย์</label>
+                                <label class="form-label">รหัสประจำตัวอาจารย์<span style="color: red;"> *</span></label>
                                 <input type="text" class="form-control" name="new_teacher_id" placeholder="รหัสประจำตัวอาจารย์" required value="<?php echo $data['teacher_id'] ?? ''; ?>" readonly>
                             </div>
 
                             <div id="input_teacher_username">
-                                <label class="form-label">ชื่อผู้ใช้งานระบบ</label>
-                                <input type="text" class="form-control" name="input_teacher_username" id="input_teacher_username" value="<?php echo $data['teacher_username'] ?? ''; ?>" placeholder="ชื่อผู้ใช้งานระบบ">
+                                <label class="form-label">ชื่อผู้ใช้งานระบบ<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="input_teacher_username" id="input_teacher_username" value="<?php echo $data['teacher_username'] ?? ''; ?>" placeholder="ชื่อผู้ใช้งานระบบ" required>
                             </div>
 
                             <div id="input_position">
-                                <label class="form-label">ตำแหน่งทางวิชาการ</label>
-                                <input type="text" id="input_position" name="input_position" class="form-control" list="position_options" placeholder="ตำแหน่งทางวิชาการ" value="<?php echo $data['position'] ?? ''; ?>">
+                                <label class="form-label">ตำแหน่งทางวิชาการ<span style="color: red;"> *</span></label>
+                                <input type="text" id="input_position" name="input_position" class="form-control" list="position_options" placeholder="ตำแหน่งทางวิชาการ" value="<?php echo $data['position'] ?? ''; ?>" required>
                                 <datalist id="position_options">
                                     <option value="ศาสตราจารย์"></option>
                                     <option value="ศาสตราจารย์ ดร."></option>
@@ -141,35 +147,36 @@ if (isset($_POST['update'])) {
                                     <option value="รองศาสตราจารย์ ดร."></option>
                                     <option value="ผู้ช่วยศาสตราจารย์"></option>
                                     <option value="ผู้ช่วยศาสตราจารย์ ดร."></option>
-                                    <option value="ดร."></option>
+                                    <option value="อาจารย์ ดร."></option>
                                     <option value="อาจารย์"></option>
+                                    <option value="ดร."></option>             
                                 </datalist>
                             </div>
 
 
                             <div id="input_firstname">
-                                <label class="form-label">ชื่อ</label>
-                                <input type="text" class="form-control" name="input_firstname" id="input_firstname" value="<?php echo $data['firstname'] ? $data['firstname'] : ''; ?>" placeholder="ชื่อ">
+                                <label class="form-label">ชื่อ<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="input_firstname" id="input_firstname" value="<?php echo $data['firstname'] ? $data['firstname'] : ''; ?>" placeholder="ชื่อ" required>
                             </div>
 
                             <div id="input_lastname">
-                                <label class="form-label">นามสกุล</label>
-                                <input type="text" class="form-control" name="input_lastname" id="input_lastname" value="<?php echo $data['lastname']; ?>" placeholder="นามสกุล">
+                                <label class="form-label">นามสกุล<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="input_lastname" id="input_lastname" value="<?php echo $data['lastname']; ?>" placeholder="นามสกุล" required>
                             </div>
 
                             <div id="input_email">
-                                <label class="form-label">อีเมล</label>
-                                <input type="text" class="form-control" name="input_email" id="input_email" value="<?php echo $data['email']; ?>" placeholder="อีเมล">
+                                <label class="form-label">อีเมล<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="input_email" id="input_email" value="<?php echo $data['email']; ?>" placeholder="@en.rmutt.ac.th" required>
                             </div>
 
                             <div id="input_phone">
                                 <label class="form-label">เบอร์โทรศัพท์</label>
-                                <input type="text" class="form-control" name="input_phone" id="input_phone" value="<?php echo $data['phone']; ?>" placeholder="092xxxxxxx">
+                                <input type="text" class="form-control" name="input_phone" id="input_phone" value="<?php echo $data['phone']; ?>" placeholder="เบอร์โทรศัพท์ไม่เอา( - )" >
                             </div>
 
                             <div id="input_level_id" class="col-md-4">
-                                <label class="form-label">สิทธิ์ผู้ใช้งาน</label>
-                                <select id="selectbox" name="input_level_id" class="form-select">
+                                <label class="form-label">สิทธิ์ผู้ใช้งาน<span style="color: red;"> *</span></label>
+                                <select id="selectbox" name="input_level_id" class="form-select" required>
                                     <option value="0" <?php if ($data['level_id'] == 0) echo 'selected'; ?>>Admin</option>
                                     <option value="1" <?php if ($data['level_id'] == 1) echo 'selected'; ?>>Teacher</option>
                                     <!-- เพิ่มตัวเลือกเพิ่มเติมตามต้องการ -->

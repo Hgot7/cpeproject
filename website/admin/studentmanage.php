@@ -2,9 +2,20 @@
 session_start();
 require_once "../connect.php";
 
+
 if (!isset($_SESSION['admin_login'])) {
   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
   header('Location: ../index.php');
+  exit();
+}
+if(isset($_SESSION['selectedYear'])){
+  unset($_SESSION['selectedYear']);
+}
+if(isset($_SESSION['selectedTerm'])){
+  unset($_SESSION['selectedTerm']);
+}
+if(isset($_SESSION['selectedGroup'])){
+  unset($_SESSION['selectedGroup']);
 }
 
 //                                   delete data
@@ -18,7 +29,7 @@ if (isset($_GET['delete'])) {
   // รันคำสั่ง SQL
   if ($deletestmt->execute()) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./studentmanage.php");
   }
 }
@@ -77,33 +88,33 @@ if (isset($_GET['delete'])) {
               $data = $stmt->fetch(PDO::FETCH_ASSOC);
               ?>
               <div id="inputstd_id">
-                <label class="form-label">รหัสรหัสประจำตัวนักศึกษา</label>
+                <label class="form-label">รหัสประจำตัวนักศึกษา<span style="color: red;"> *</span></label>
                 <input type="number" class="form-control" name="inputstd_id" id="inputstd_id" value="<?php if (isset($_POST['inputstd_id'])) {
                                                                                                         echo $_POST['inputstd_id'];
-                                                                                                      } ?>" placeholder="รหัสรหัสประจำตัวนักศึกษาไม่เอา( - )">
+                                                                                                      } ?>"required placeholder="รหัสประจำตัวนักศึกษาไม่มี( - )">
               </div>
 
 
               <div id="inputname">
-                <label class="form-label">ชื่อ</label>
-                <input type="text" class="form-control" name="inputname" id="inputname" value="<?php echo isset($_POST['inputname']) ?  $_POST['inputname'] : '' ?>" placeholder="ชื่อ">
+                <label class="form-label">ชื่อ<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputname" id="inputname" value="<?php echo isset($_POST['inputname']) ?  $_POST['inputname'] : '' ?>"required placeholder="ชื่อ">
               </div>
 
               <div id="inputlastname">
-                <label class="form-label">นามสกุล</label>
-                <input type="text" class="form-control" name="inputlastname" id="inputlastname" placeholder="นามสกุล">
+                <label class="form-label">นามสกุล<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputlastname" id="inputlastname"required placeholder="นามสกุล">
               </div>
 
               <div id="inputyear">
-                <label class="form-label">ปีการศึกษาที่ลงทะเบียน</label>
-                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษาที่ลงทะเบียน">
+                <label class="form-label">ปีการศึกษาที่ลงทะเบียน<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>"required placeholder="ปีการศึกษาที่ลงทะเบียน">
               </div>
 
 
 
               <div id="inputterm">
-                <label class="form-label">ภาคการศึกษา</label>
-                <select id="selectbox" name="inputterm" class="form-select">
+                <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="inputterm" class="form-select" required>
                   <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -118,13 +129,13 @@ if (isset($_GET['delete'])) {
 
               <div id="inputphone">
                 <label class="form-label">เบอร์โทรศัพท์</label>
-                <input type="text" class="form-control" name="inputphone" id="inputphone" placeholder="092xxxxxxx">
+                <input type="text" class="form-control" name="inputphone" id="inputphone" placeholder="เบอร์โทรศัพท์ไม่เอา( - )">
               </div>
 
 
-              <div class="col-md-4" id="inputgroup">
-                <label class="form-label">กลุ่มเรียนนักศึกษา</label>
-                <select id="selectbox" name="inputgroup" class="form-select">
+              <div  id="inputgroup">
+                <label class="form-label">กลุ่มเรียนนักศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="inputgroup" class="form-select" required>
                   <?php
                   $groups = $conn->query("SELECT * FROM `groups` ORDER BY group_id DESC");
                   $groups->execute();
@@ -204,16 +215,33 @@ if (isset($_GET['delete'])) {
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                        if (isset($_POST['resetfilter'])) {
+                          unset($_SESSION['selectedYear']);
+                          unset($_SESSION['selectedTerm']);
+                          unset($_SESSION['selectedGroup']);
+                        }
+                        if (isset($_POST['submitfilter'])) {
+                          $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                          $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                          $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                          $selectedYear =  $_SESSION['selectedYear'];
+                          $selectedTerm =   $_SESSION['selectedTerm'];
+                          $selectedGroup = $_SESSION['selectedGroup'];
+                        }
                       $years = $conn->query("SELECT DISTINCT year FROM `student` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                          $yearValue = $datayear['year'];
+                          $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                            <?php echo $yearValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -223,14 +251,18 @@ if (isset($_GET['delete'])) {
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `student` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -245,14 +277,18 @@ if (isset($_GET['delete'])) {
                         HAVING COUNT(student.group_id) >= 1
                         ORDER BY groups.group_name DESC");
                       $groups->execute();
+                      $selectedGroup = isset($_SESSION['selectedGroup']) ? $_SESSION['selectedGroup'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables     
                       ?>
                       <option value="">เลือกกลุ่มเรียน</option>
                       <?php
-                      while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datagroup['group_name']; ?>">
-                          <?php echo $datagroup['group_name']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) {
+                          $groupValue = $datagroup['group_name'];
+                          $isGroupSelected = ($selectedGroup == $groupValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $groupValue; ?>" <?php echo $isGroupSelected; ?>>
+                            <?php echo $groupValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -260,6 +296,11 @@ if (isset($_GET['delete'])) {
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
                   </div>
+
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                      <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
+                    </div>
+
                 </div>
               </form>
 
@@ -333,9 +374,9 @@ if (isset($_GET['delete'])) {
                     //start
                     // filter term and year
                     if (isset($_POST['submitfilter'])) {
-                      $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                      $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
-                      $selectedGroup = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                      // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                      // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                      // $selectedGroup = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
 
                       if (empty($selectedYear) && empty($selectedTerm) && empty($selectedGroup)) {
                         $sql = "SELECT * FROM student";

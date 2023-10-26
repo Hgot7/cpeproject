@@ -48,7 +48,7 @@ function giveStudentdentNameById($conn, $student_id)
     $result = $stmt->fetch(); // รับผลลัพธ์จากคำสั่ง SQL
 
     if ($result !== false) { // ตรวจสอบว่ามีข้อมูลหรือไม่
-        return $result['firstname'] ." ". $result['lastname']; // ส่งกลับข้อมูลไฟล์
+        return $result['firstname'] . " " . $result['lastname']; // ส่งกลับข้อมูลไฟล์
     }
 
     return null; // หรือส่งค่าอื่นที่เหมาะสมตามสถานการณ์
@@ -62,13 +62,13 @@ function assessmentCheck($conn, $project_id, $data)
         WHERE t.topic_section_id = :topic_section_id
         AND a.referee_id = :referee_id
         AND a.project_id = :project_id");
-        
+
     $stmt->bindParam(':topic_section_id', $data);
     $stmt->bindParam(':referee_id', $_SESSION['teacher_id']);
     $stmt->bindParam(':project_id', $project_id);
     $stmt->execute();
     $result = $stmt->fetchAll();
-    
+
     return count($result) > 0 ? 1 : 0;
 }
 
@@ -93,7 +93,7 @@ function assessmentCheck($conn, $project_id, $data)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
 
 
-    <title>Teacher</title>
+    <title>รายการประเมินโครงงาน</title>
 
 </head>
 
@@ -147,53 +147,55 @@ function assessmentCheck($conn, $project_id, $data)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header" id="panelsStayOpen-headingDocument">
                                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseDocument" aria-expanded="false" aria-controls="panelsStayOpen-collapseDocument">
-                                        รายละเอียดโครงงาน : <?php echo giveProjectNameTH($conn, $project_id); ?>
+                                            รายละเอียดโครงงาน : <?php echo giveProjectNameTH($conn, $project_id); ?>
                                         </button>
                                     </h2>
                                     <div id="panelsStayOpen-collapseDocument" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingDocument">
                                         <div class="accordion-body">
-                                        <?php
-                                         $sql = "SELECT * FROM `project` WHERE project_id = :project_id";
-                                         $stmt = $conn->prepare($sql);
-                                         $stmt->bindParam(':project_id', $project_id);
-                                         $stmt->execute();
-                                         $result = $stmt->fetch();
+                                            <?php
+                                            $sql = "SELECT * FROM `project` WHERE project_id = :project_id";
+                                            $stmt = $conn->prepare($sql);
+                                            $stmt->bindParam(':project_id', $project_id);
+                                            $stmt->execute();
+                                            $result = $stmt->fetch();
 
-                                         $studentAll = array();
-                                         if(isset($result['student_id3'])){
-                                            $studentAll[0] = $result['student_id1'];
-                                            $studentAll[1] = $result['student_id2'];
-                                            $studentAll[2] = $result['student_id3'];
-                                         }elseif(empty($result['student_id3'])){          
-                                            $studentAll[0] = $result['student_id1'];
-                                            $studentAll[1] = $result['student_id2'];
-                                         }
-                                         foreach ($studentAll as $i => $student) {
-                                        ?>
-                                        <div class="mb-3">
-                                                <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
-                                                    <div class="col-md-6 text-start">
-                                                    <strong> </h4><?php echo "สมาชิกโครงงาน " .($i+1)?></h4></strong>
-                                                    </div>
-                                                    <div class="col-md-6 text-start">
-                                                    <?php echo giveStudentdentNameById($conn, $student); ?>
-                                                    </div>
-                                                    <div class="col-md-6 text-start">
-                                                    <strong><?php echo "คะแนน"; ?></strong>
-                                                    </div>
-                                                    <?php 
-                                                    $sql = "SELECT score FROM `student` WHERE student_id = :student_id";
-                                                    $stmt = $conn->prepare($sql);
-                                                    $stmt->bindParam(':student_id', $student);
-                                                    $stmt->execute();
-                                                    $showScore = $stmt->fetch();
-                                                    ?>
-                                                    <div class="col-md-6 text-start">
-                                                        <?php echo round($showScore['score']); ?>
-                                                    </div>
+                                            $studentAll = array();
+                                            if (isset($result['student_id3'])) {
+                                                $studentAll[0] = $result['student_id1'];
+                                                $studentAll[1] = $result['student_id2'];
+                                                $studentAll[2] = $result['student_id3'];
+                                            } elseif (empty($result['student_id2'])) {
+                                                $studentAll[0] = $result['student_id1'];
+                                            }elseif (empty($result['student_id3'])) {
+                                                $studentAll[0] = $result['student_id1'];
+                                                $studentAll[1] = $result['student_id2'];
+                                            }
+                                            foreach ($studentAll as $i => $student) {
+                                            ?>
+                                                <div class="mb-3">
+                                                    <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
+                                                        <div class="col-md-6 text-start">
+                                                            <strong> </h4><?php echo "สมาชิกโครงงาน " . ($i + 1) ?></h4></strong>
+                                                        </div>
+                                                        <div class="col-md-6 text-start">
+                                                            <?php echo giveStudentdentNameById($conn, $student); ?>
+                                                        </div>
+                                                        <div class="col-md-6 text-start">
+                                                            <strong><?php echo "คะแนน"; ?></strong>
+                                                        </div>
+                                                        <?php
+                                                        $sql = "SELECT score FROM `student` WHERE student_id = :student_id";
+                                                        $stmt = $conn->prepare($sql);
+                                                        $stmt->bindParam(':student_id', $student);
+                                                        $stmt->execute();
+                                                        $showScore = $stmt->fetch();
+                                                        ?>
+                                                        <div class="col-md-6 text-start">
+                                                            <?php echo round($showScore['score']); ?>
+                                                        </div>
 
+                                                    </div>
                                                 </div>
-                                            </div>
                                             <?php } ?>
 
                                             <?php
@@ -205,7 +207,7 @@ function assessmentCheck($conn, $project_id, $data)
                                             <div class="mb-3">
                                                 <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
                                                     <div class="col-md-6 text-start">
-                                                    <strong></h4><?php echo "เอกสารโปสเตอร์" ?></h4></strong>
+                                                        <strong></h4><?php echo "เอกสารโปสเตอร์" ?></h4></strong>
                                                     </div>
                                                     <div class="col-md-6 text-start">
                                                         </h5><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></h5>
@@ -218,10 +220,10 @@ function assessmentCheck($conn, $project_id, $data)
                                             <div class="mb-3">
                                                 <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
                                                     <div class="col-md-6 text-start">
-                                                    <strong></h4><?php echo "เอกสารรูปเล่มฉบับเต็ม" ?></h4></strong>
+                                                        <strong></h4><?php echo "เอกสารรูปเล่มฉบับเต็ม" ?></h4></strong>
                                                     </div>
                                                     <div class="col-md-6 text-start">
-                                                   </h5><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></h5>
+                                                        </h5><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></h5>
                                                     </div>
 
 
@@ -238,71 +240,71 @@ function assessmentCheck($conn, $project_id, $data)
 
                         <!-- การเสนอผลงานภาคบรรยาย -->
                         <?php
-$sql = "SELECT * FROM `project`
+                        $sql = "SELECT * FROM `project`
         WHERE project_id = :project_id 
         AND year = (SELECT year FROM `defaultsystem` WHERE default_system_id = :id) 
         AND term = (SELECT term FROM `defaultsystem` WHERE default_system_id = :id)";
 
-$stmt = $conn->prepare($sql);
-$defaultSystemId = 1;
-$stmt->bindParam(':id', $defaultSystemId, PDO::PARAM_INT);
-$stmt->bindParam(':project_id', $project_id, PDO::PARAM_STR);
-$stmt->execute();
-$testCheck = $stmt->fetchAll();
+                        $stmt = $conn->prepare($sql);
+                        $defaultSystemId = 1;
+                        $stmt->bindParam(':id', $defaultSystemId, PDO::PARAM_INT);
+                        $stmt->bindParam(':project_id', $project_id, PDO::PARAM_STR);
+                        $stmt->execute();
+                        $testCheck = $stmt->fetchAll();
 
-$teacherCheck = $conn->prepare("SELECT * FROM `project` WHERE project_id = :project_id AND (teacher_id1 = :teacher_id OR teacher_id2 = :teacher_id)");
-$teacherCheck->bindParam(':project_id', $project_id, PDO::PARAM_STR);
-$teacherCheck->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
-$teacherCheck->execute();
-$teacherCheckResult = $teacherCheck->fetchAll();
+                        $teacherCheck = $conn->prepare("SELECT * FROM `project` WHERE project_id = :project_id AND (teacher_id1 = :teacher_id OR teacher_id2 = :teacher_id)");
+                        $teacherCheck->bindParam(':project_id', $project_id, PDO::PARAM_STR);
+                        $teacherCheck->bindParam(':teacher_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
+                        $teacherCheck->execute();
+                        $teacherCheckResult = $teacherCheck->fetchAll();
 
-if (empty($teacherCheckResult)) {
-    $stmt = $conn->prepare("SELECT * FROM `topicsection` WHERE (topic_section_level = 0 or topic_section_level = 2) AND topic_section_status = 1");
-    // ให้ level เป็น 1 ถ้าไม่ใช่อาจารย์
-} else {
-    $stmt = $conn->prepare("SELECT * FROM `topicsection` WHERE  (topic_section_level = 1 or topic_section_level = 2) AND topic_section_status = 1");
-    // ให้ level เป็น 0 ถ้าเป็นอาจารย์
-}
+                        if (empty($teacherCheckResult)) {
+                            $stmt = $conn->prepare("SELECT * FROM `topicsection` WHERE (topic_section_level = 0 or topic_section_level = 2) AND topic_section_status = 1");
+                            // ให้ level เป็น 1 ถ้าไม่ใช่อาจารย์
+                        } else {
+                            $stmt = $conn->prepare("SELECT * FROM `topicsection` WHERE  (topic_section_level = 1 or topic_section_level = 2) AND topic_section_status = 1");
+                            // ให้ level เป็น 0 ถ้าเป็นอาจารย์
+                        }
 
-// $stmt = $conn->prepare("SELECT * FROM `topicSection` WHERE topic_section_level != :topic_section_level AND topic_section_level != 0 ");
-// $stmt->bindParam(':topic_section_level', $topicSectionLevel, PDO::PARAM_INT);
-$stmt->execute();
-$datas = $stmt->fetchAll();
+                        // $stmt = $conn->prepare("SELECT * FROM `topicSection` WHERE topic_section_level != :topic_section_level AND topic_section_level != 0 ");
+                        // $stmt->bindParam(':topic_section_level', $topicSectionLevel, PDO::PARAM_INT);
+                        $stmt->execute();
+                        $datas = $stmt->fetchAll();
 
-$indextopic_section = 0;
-if (!empty($testCheck)) {
-    foreach ($datas as $data) {
-        $indextopic_section++;
-        $sql = "SELECT * FROM `topic` WHERE topic_section_id = :topic_section_id AND topic_status = 1 ORDER BY topic_name";
-        $projectpoint = $conn->prepare($sql);
-        $projectpoint->bindParam(':topic_section_id', $data['topic_section_id'], PDO::PARAM_STR);
-        $projectpoint->execute();
-        $topic_datas = $projectpoint->fetchAll();
-        ?>
+                        $indextopic_section = 0;
+                        if (!empty($testCheck)) {
+                            foreach ($datas as $data) {
+                                $indextopic_section++;
+                                $sql = "SELECT * FROM `topic` WHERE topic_section_id = :topic_section_id AND topic_status = 1 ORDER BY topic_name";
+                                $projectpoint = $conn->prepare($sql);
+                                $projectpoint->bindParam(':topic_section_id', $data['topic_section_id'], PDO::PARAM_STR);
+                                $projectpoint->execute();
+                                $topic_datas = $projectpoint->fetchAll();
+                        ?>
 
-        <?php if ($data['topic_section_format'] == 1) { ?>
-            <div class="row g-3 mb-4 d-flex align-items-center text-center">
-                <div class="accordion" id="Assessment">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse<?php echo $indextopic_section; ?>" aria-expanded="false" aria-controls="panelsStayOpen-collapse<?php echo $indextopic_section; ?>">
-                                <?php echo $data['topic_section']; ?> 
-                                <?php 
-                                $j = assessmentCheck($conn, $project_id,$data['topic_section_id']);
-                                if ($j == 1) : $fileStatusHave = false; ?>
-                                            <div class="col-auto">
-                                                <div class="text-end ms-3">
-                                                    <i class="bi bi-circle-fill text-success"></i>
-                                                    <i>ประเมินเสร็จสิ้น</i>
-                                                </div>
-                                            </div>
-                                            <?php endif; ?>
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapse<?php echo $indextopic_section; ?>" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
-                            <div class="accordion-body">
-                                <form method="post" action="./assessment.php">
-                                <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
+                                <?php if ($data['topic_section_format'] == 1) { ?>
+                                    <div class="row g-3 mb-4 d-flex align-items-center text-center">
+                                        <div class="accordion" id="Assessment">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse<?php echo $indextopic_section; ?>" aria-expanded="false" aria-controls="panelsStayOpen-collapse<?php echo $indextopic_section; ?>">
+                                                        <?php echo $data['topic_section']; ?>
+                                                        <?php
+                                                        $j = assessmentCheck($conn, $project_id, $data['topic_section_id']);
+                                                        if ($j == 1) : $fileStatusHave = false; ?>
+                                                            <div class="col-auto">
+                                                                <div class="text-end ms-3">
+                                                                    <i class="bi bi-circle-fill text-success"></i>
+                                                                    <i>ประเมินเสร็จสิ้น</i>
+                                                                </div>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </button>
+                                                </h2>
+                                                <div id="panelsStayOpen-collapse<?php echo $indextopic_section; ?>" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
+                                                    <div class="accordion-body">
+                                                        <form method="post" action="./assessment.php">
+                                                            <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
                                                                 <div class="col-md-6 text-start">
                                                                     <h5></h5>
                                                                 </div>
@@ -323,97 +325,97 @@ if (!empty($testCheck)) {
                                                                     <div>มากที่สุด</div>
                                                                 </div>
                                                             </div>
-                                    <?php
-                                    //หัวคะแนน
-                                    $index = 0;
-                                    foreach ($topic_datas as $topic_data) {
-                                        $index++;
+                                                            <?php
+                                                            //หัวคะแนน
+                                                            $index = 0;
+                                                            foreach ($topic_datas as $topic_data) {
+                                                                $index++;
 
-                                        $sql = "SELECT * FROM `assessment` WHERE topic_id = :topic_id AND referee_id = :referee_id AND project_id = :project_id";
-                                        $assessmentpoint = $conn->prepare($sql);
-                                        $assessmentpoint->bindParam(':topic_id', $topic_data['topic_id'], PDO::PARAM_STR);
-                                        $assessmentpoint->bindParam(':referee_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
-                                        $assessmentpoint->bindParam(':project_id', $project_id, PDO::PARAM_STR); // ควรเพิ่ม PDO::PARAM_STR ที่ parameter นี้
-                                        $assessmentpoint->execute();
-                                        $assessment_score = $assessmentpoint->fetch(PDO::FETCH_ASSOC); // ใช้ fetch แทน fetchAll เนื่องจากเราต้องการแถวเดียว
+                                                                $sql = "SELECT * FROM `assessment` WHERE topic_id = :topic_id AND referee_id = :referee_id AND project_id = :project_id";
+                                                                $assessmentpoint = $conn->prepare($sql);
+                                                                $assessmentpoint->bindParam(':topic_id', $topic_data['topic_id'], PDO::PARAM_STR);
+                                                                $assessmentpoint->bindParam(':referee_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
+                                                                $assessmentpoint->bindParam(':project_id', $project_id, PDO::PARAM_STR); // ควรเพิ่ม PDO::PARAM_STR ที่ parameter นี้
+                                                                $assessmentpoint->execute();
+                                                                $assessment_score = $assessmentpoint->fetch(PDO::FETCH_ASSOC); // ใช้ fetch แทน fetchAll เนื่องจากเราต้องการแถวเดียว
 
-                                        // ตรวจสอบว่าคีย์ 'score' มีอยู่ใน $assessment_score หรือไม่
-                                        if (isset($assessment_score['score'])) {
-                                            $selected_score = $assessment_score['score'];
-                                        } else {
-                                            $selected_score = ''; // หรือค่าเริ่มต้นอื่นๆ ที่คุณต้องการให้มีค่า
-                                        }
-                                    ?>
-                                        <div class="mb-3">
-                                            <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
-                                                <div class="col-md-6 text-start">
-                                                    <h5><?php echo $topic_data['topic_name']; ?> </h5>
+                                                                // ตรวจสอบว่าคีย์ 'score' มีอยู่ใน $assessment_score หรือไม่
+                                                                if (isset($assessment_score['score'])) {
+                                                                    $selected_score = $assessment_score['score'];
+                                                                } else {
+                                                                    $selected_score = ''; // หรือค่าเริ่มต้นอื่นๆ ที่คุณต้องการให้มีค่า
+                                                                }
+                                                            ?>
+                                                                <div class="mb-3">
+                                                                    <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
+                                                                        <div class="col-md-6 text-start">
+                                                                            <h5><?php echo $topic_data['topic_name']; ?> </h5>
+                                                                        </div>
+                                                                        <?php
+
+                                                                        // ลูปสร้างปุ่มรีดิโอ
+                                                                        for ($i = 1; $i <= 5; $i++) {
+                                                                            echo '<div class="col-1">';
+                                                                            echo '<div class="form-check form-check-inline">';
+                                                                            echo '<input class="form-check-input" type="radio" name="projectpoint' . $index . '" value="' . $i . '"';
+
+                                                                            // เช็คว่าคะแนนในปุ่มรีดิโอตรงกับคะแนนที่ถูกเลือกหรือไม่
+                                                                            if ($i == $selected_score) {
+                                                                                echo ' checked';
+                                                                            }
+
+                                                                            echo '>';
+                                                                            echo '<label class="form-check-label" for="projectpoint' . $i . '">' . $i . '</label>';
+                                                                            echo '</div>';
+                                                                            echo '</div>';
+                                                                        }
+                                                                        ?>
+
+                                                                    </div>
+                                                                </div>
+
+                                                            <?php
+                                                            }
+                                                            ?>
+                                                            <div class="d-grid gap-2">
+                                                                <?php
+                                                                $topic_datas = json_encode($topic_datas);
+                                                                echo '<input type="hidden" name="topic_datas" value="' . htmlspecialchars($topic_datas, ENT_QUOTES, 'UTF-8') . '">';
+                                                                ?>
+                                                                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                                                <button style="font-family: 'IBM Plex Sans Thai', sans-serif;" type="submit" class="btn btn-success">บันทึก</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
                                                 </div>
-                                                <?php
-
-                                                // ลูปสร้างปุ่มรีดิโอ
-                                                for ($i = 1; $i <= 5; $i++) {
-                                                    echo '<div class="col-1">';
-                                                    echo '<div class="form-check form-check-inline">';
-                                                    echo '<input class="form-check-input" type="radio" name="projectpoint' . $index . '" value="' . $i . '"';
-
-                                                    // เช็คว่าคะแนนในปุ่มรีดิโอตรงกับคะแนนที่ถูกเลือกหรือไม่
-                                                    if ($i == $selected_score) {
-                                                        echo ' checked';
-                                                    }
-
-                                                    echo '>';
-                                                    echo '<label class="form-check-label" for="projectpoint' . $i . '">' . $i . '</label>';
-                                                    echo '</div>';
-                                                    echo '</div>';
-                                                }
-                                                ?>
-
                                             </div>
                                         </div>
-
-                                    <?php
-                                    }
-                                    ?>
-                                    <div class="d-grid gap-2">
-                                        <?php
-                                        $topic_datas = json_encode($topic_datas);
-                                        echo '<input type="hidden" name="topic_datas" value="' . htmlspecialchars($topic_datas, ENT_QUOTES, 'UTF-8') . '">';
-                                        ?>
-                                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                                        <button style="font-family: 'IBM Plex Sans Thai', sans-serif;" class="btn btn-success">บันทึก</button>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php
-        }
-        ?>
-        <?php if ($data['topic_section_format'] == 0) { ?>
-            <div class="row g-3 mb-4 d-flex align-items-center text-center">
-                <div class="accordion" id="Assessment">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse<?php echo $indextopic_section; ?>" aria-expanded="false" aria-controls="panelsStayOpen-collapse<?php echo $indextopic_section; ?>">
-                                <?php echo $data['topic_section']; ?> <?php 
-                                $j = assessmentCheck($conn, $project_id,$data['topic_section_id']);
-                                if ($j == 1) : $fileStatusHave = false; ?>
-                                            <div class="col-auto">
-                                                <div class="text-end ms-3">
-                                                    <i class="bi bi-circle-fill text-success"></i>
-                                                    <i>ประเมินเสร็จสิ้น</i>
-                                                </div>
-                                            </div>
-                                            <?php endif; ?>
-                            </button>
-                        </h2>
-                        <div id="panelsStayOpen-collapse<?php echo $indextopic_section; ?>" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
-                            <div class="accordion-body">
-                                <form method="post" action="./assessment2.php">
-                                <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
+                                <?php
+                                }
+                                ?>
+                                <?php if ($data['topic_section_format'] == 0) { ?>
+                                    <div class="row g-3 mb-4 d-flex align-items-center text-center">
+                                        <div class="accordion" id="Assessment">
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header" id="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapse<?php echo $indextopic_section; ?>" aria-expanded="false" aria-controls="panelsStayOpen-collapse<?php echo $indextopic_section; ?>">
+                                                        <?php echo $data['topic_section']; ?> <?php
+                                                                                                $j = assessmentCheck($conn, $project_id, $data['topic_section_id']);
+                                                                                                if ($j == 1) : $fileStatusHave = false; ?>
+                                                            <div class="col-auto">
+                                                                <div class="text-end ms-3">
+                                                                    <i class="bi bi-circle-fill text-success"></i>
+                                                                    <i>ประเมินเสร็จสิ้น</i>
+                                                                </div>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </button>
+                                                </h2>
+                                                <div id="panelsStayOpen-collapse<?php echo $indextopic_section; ?>" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-heading<?php echo $indextopic_section; ?>">
+                                                    <div class="accordion-body">
+                                                        <form method="post" action="./assessment2.php">
+                                                            <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
                                                                 <div class="col-md-6 text-start">
                                                                     <h5></h5>
                                                                 </div>
@@ -434,101 +436,187 @@ if (!empty($testCheck)) {
                                                                     <div>มากที่สุด</div>
                                                                 </div>
                                                             </div>
-                                    <?php
-                                    $index = 0;
-                                    foreach ($topic_datas as $topic_data) {
-                                        $index++;
-                                        $stdName = $conn->prepare("SELECT * FROM `project` WHERE project_id = :project_id ");
-                                        $stdName->bindParam(':project_id', $project_id, PDO::PARAM_STR);
-                                        $stdName->execute();
-                                        $stdName = $stdName->fetch();
-    
-                                        $stdNames = array(); // Initialize an empty array to store student data
-    
-                                        for ($i = 0; $i < 3; $i++) {
-                                            $std = 'student_id' . ($i + 1); // Corrected the identifier
-                                            if (isset($stdName[$std])) {
-                                                $stdNames[$i] = $stdName[$std];
-                                            }
-                                        }
-                                        $indexStdName = 0;
-                                    foreach ($stdNames as $stdName) {
-                                        $sql = "SELECT * FROM `assessment` WHERE topic_id = :topic_id AND referee_id = :referee_id AND project_id = :project_id AND student_id = :student_id";
-                                        $assessmentpoint = $conn->prepare($sql);
-                                        $assessmentpoint->bindParam(':topic_id', $topic_data['topic_id'], PDO::PARAM_STR);
-                                        $assessmentpoint->bindParam(':referee_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
-                                        $assessmentpoint->bindParam(':project_id', $project_id, PDO::PARAM_STR);
-                                        $assessmentpoint->bindParam(':student_id', $stdNames[$indexStdName], PDO::PARAM_STR); // ควรเพิ่ม PDO::PARAM_STR ที่ parameter นี้
-                                        $assessmentpoint->execute();
-                                        $assessment_score = $assessmentpoint->fetch(PDO::FETCH_ASSOC); // ใช้ fetch แทน fetchAll เนื่องจากเราต้องการแถวเดียว
+                                                            <?php
+                                                            $index = 0;
+                                                            foreach ($topic_datas as $topic_data) {
+                                                                $index++;
+                                                                $stdName = $conn->prepare("SELECT * FROM `project` WHERE project_id = :project_id ");
+                                                                $stdName->bindParam(':project_id', $project_id, PDO::PARAM_STR);
+                                                                $stdName->execute();
+                                                                $stdName = $stdName->fetch();
 
-                                        // ตรวจสอบว่าคีย์ 'score' มีอยู่ใน $assessment_score หรือไม่
-                                        if (isset($assessment_score['score'])) {
-                                            $selected_score = $assessment_score['score'];
-                                        } else {
-                                            $selected_score = ''; // หรือค่าเริ่มต้นอื่นๆ ที่คุณต้องการให้มีค่า
-                                        }
-                                    ?>
-                                       <div class="mb-3">
-                                            <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
-                                                <div class="col-md-6 text-start">
-                                                    <h5><?php echo $topic_data['topic_name']; ?> </h5>
-                                                    <p><?php echo giveStudentdentNameById($conn, $stdNames[$indexStdName]); ?></p>
+                                                                $stdNames = array(); // Initialize an empty array to store student data
+
+                                                                for ($i = 0; $i < 3; $i++) {
+                                                                    $std = 'student_id' . ($i + 1); // Corrected the identifier
+                                                                    if (isset($stdName[$std])) {
+                                                                        $stdNames[$i] = $stdName[$std];
+                                                                    }
+                                                                }
+                                                                $indexStdName = 0;
+                                                                foreach ($stdNames as $stdName) {
+                                                                    $sql = "SELECT * FROM `assessment` WHERE topic_id = :topic_id AND referee_id = :referee_id AND project_id = :project_id AND student_id = :student_id";
+                                                                    $assessmentpoint = $conn->prepare($sql);
+                                                                    $assessmentpoint->bindParam(':topic_id', $topic_data['topic_id'], PDO::PARAM_STR);
+                                                                    $assessmentpoint->bindParam(':referee_id', $_SESSION['teacher_id'], PDO::PARAM_STR);
+                                                                    $assessmentpoint->bindParam(':project_id', $project_id, PDO::PARAM_STR);
+                                                                    $assessmentpoint->bindParam(':student_id', $stdNames[$indexStdName], PDO::PARAM_STR); // ควรเพิ่ม PDO::PARAM_STR ที่ parameter นี้
+                                                                    $assessmentpoint->execute();
+                                                                    $assessment_score = $assessmentpoint->fetch(PDO::FETCH_ASSOC); // ใช้ fetch แทน fetchAll เนื่องจากเราต้องการแถวเดียว
+
+                                                                    // ตรวจสอบว่าคีย์ 'score' มีอยู่ใน $assessment_score หรือไม่
+                                                                    if (isset($assessment_score['score'])) {
+                                                                        $selected_score = $assessment_score['score'];
+                                                                    } else {
+                                                                        $selected_score = ''; // หรือค่าเริ่มต้นอื่นๆ ที่คุณต้องการให้มีค่า
+                                                                    }
+                                                            ?>
+                                                                    <div class="mb-3">
+                                                                        <div class="row g-3 mb-4 d-flex align-items-center text-center border-bottom">
+                                                                            <div class="col-md-6 text-start">
+                                                                                <h5><?php echo $topic_data['topic_name']; ?> </h5>
+                                                                                <p><?php echo giveStudentdentNameById($conn, $stdNames[$indexStdName]); ?></p>
+                                                                            </div>
+                                                                            <?php
+
+
+                                                                            // ลูปสร้างปุ่มรีดิโอ
+                                                                            for ($i = 1; $i <= 5; $i++) {
+                                                                                echo '<div class="col-1">';
+                                                                                echo '<div class="form-check form-check-inline">';
+                                                                                echo '<input class="form-check-input" type="radio" name="projectpoint' . $index . '_' . $stdNames[$indexStdName] . '" value="' . $i . '"';
+
+                                                                                // เช็คว่าคะแนนในปุ่มรีดิโอตรงกับคะแนนที่ถูกเลือกหรือไม่
+                                                                                if ($i == $selected_score) {
+                                                                                    echo ' checked';
+                                                                                }
+
+                                                                                echo '>';
+                                                                                echo '<label class="form-check-label" for="projectpoint' . $index . '_' . $stdNames[$indexStdName] . '">' . $i . '</label>';
+                                                                                echo '</div>';
+                                                                                echo '</div>';
+                                                                            }
+                                                                            $indexStdName++;
+                                                                            ?>
+
+                                                                        </div>
+                                                                    </div>
+
+                                                            <?php
+                                                                }
+                                                            }
+                                                            ?>
+                                                            <div class="d-grid gap-2">
+                                                                <?php
+                                                                $topic_datas = json_encode($topic_datas);
+                                                                echo '<input type="hidden" name="topic_datas" value="' . htmlspecialchars($topic_datas, ENT_QUOTES, 'UTF-8') . '">';
+                                                                ?>
+                                                                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
+                                                                <button style="font-family: 'IBM Plex Sans Thai', sans-serif;" type="submit" class="btn btn-success">บันทึก</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
                                                 </div>
-                                                <?php
-
-
-                                                // ลูปสร้างปุ่มรีดิโอ
-                                                for ($i = 1; $i <= 5; $i++) {
-                                                    echo '<div class="col-1">';
-                                                    echo '<div class="form-check form-check-inline">';
-                                                    echo '<input class="form-check-input" type="radio" name="projectpoint' . $index . '_'.$stdNames[$indexStdName].'" value="' . $i . '"';
-
-                                                    // เช็คว่าคะแนนในปุ่มรีดิโอตรงกับคะแนนที่ถูกเลือกหรือไม่
-                                                    if ($i == $selected_score) {
-                                                        echo ' checked';
-                                                    }
-
-                                                    echo '>';
-                                                    echo '<label class="form-check-label" for="projectpoint' . $index . '_'.$stdNames[$indexStdName].'">' . $i . '</label>';
-                                                    echo '</div>';
-                                                    echo '</div>';
-                                                }
-                                                $indexStdName++;
-                                                ?>
-
                                             </div>
                                         </div>
-
-                                    <?php
-                                    }}
-                                    ?>
-                                    <div class="d-grid gap-2">
-                                        <?php
-                                        $topic_datas = json_encode($topic_datas);
-                                        echo '<input type="hidden" name="topic_datas" value="' . htmlspecialchars($topic_datas, ENT_QUOTES, 'UTF-8') . '">';
-                                        ?>
-                                        <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-                                        <button style="font-family: 'IBM Plex Sans Thai', sans-serif;" class="btn btn-success">บันทึก</button>
                                     </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php
-    }}
-} else {
-    echo '<p style="text-align:center; color:red; font-size:36px;"><b>***หมดเวลาการประเมินโครงงาน***</b></p>';
-}
-?>
+                        <?php
+                                }
+                            }
+                        } else {
+                            echo '<p style="text-align:center; color:red; font-size:36px;"><b>***หมดเวลาการประเมินโครงงาน***</b></p>';
+                        }
+                        ?>
 
 
 
             </main>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            function checkAccordionStatus() {
+                const collapseStatus = localStorage.getItem("accordionCollapseStatus");
+                if (collapseStatus) {
+                    const accordionCollapseElements = document.querySelectorAll(".accordion-collapse");
+                    accordionCollapseElements.forEach((collapse) => {
+                        if (collapse.id === collapseStatus) {
+                            // เปิด accordion-collapse ที่มี id ตรงกับสถานะใน localStorage
+                            collapse.classList.add("show");
+
+                            // หาปุ่มที่ใช้ในการเปิด accordion-collapse
+                            const button = document.querySelector(`[data-bs-target="#${collapse.id}"]`);
+                            if (button) {
+                                // เพิ่มคลาส "accordion-button" ให้กับปุ่ม
+                                button.classList.remove('collapsed');
+                            } else {
+                                button.classList.add("accordion-button collapsed");
+                            }
+                        }
+                    });
+                }
+
+            }
+
+            // ตรวจสอบสถานะ accordion-collapse เมื่อหน้าเว็บโหลด
+            checkAccordionStatus();
+
+            // ตรวจสอบสถานะ accordion-collapse เมื่อมีการคลิกที่ปุ่มอัปโหลด
+            const saveButtons = document.querySelectorAll(".btn-success[type='submit']");
+            saveButtons.forEach((button) => {
+                button.addEventListener("click", function() {
+                    const parentCollapse = this.closest(".accordion-item").querySelector(".accordion-collapse");
+                    if (parentCollapse) {
+                        // บันทึกตำแหน่ง scroll ใน localStorage
+                        localStorage.setItem("scrollPositionY", window.scrollY);
+                        // บันทึกสถานะ accordion-collapse ที่กดเปิดไว้ใน localStorage
+                        localStorage.setItem("accordionCollapseStatus", parentCollapse.id);
+
+                        // หาปุ่มที่ใช้ในการเปิด accordion-collapse
+                        const button = document.querySelector(`[data-bs-target="#${parentCollapse.id}"]`);
+                        if (button) {
+                            // เพิ่มคลาส "accordion-button" ให้กับปุ่ม
+                            button.classList.remove('collapsed');
+                        } else {
+                            button.classList.add("accordion-button collapsed");
+                        }
+                    }
+                });
+            });
+            // ตรวจสอบว่ามีตำแหน่ง scroll ที่ถูกบันทึกไว้ใน localStorage หรือไม่
+            const scrollPositionY = localStorage.getItem("scrollPositionY");
+            if (scrollPositionY) {
+                // คืนค่าตำแหน่ง scroll ให้กับหน้าเว็บ
+                window.scrollTo(0, scrollPositionY);
+
+                // หลังจากคืนค่าตำแหน่ง scroll ให้ลบค่าที่ถูกบันทึกไว้ใน localStorage ออก
+                localStorage.removeItem("scrollPositionY");
+            }
+            
+
+            // ตรวจสอบสถานะ accordion-collapse เมื่อมีการคลิกที่ปุ่มหรือไม่เมื่อเปลี่ยนที่คลิก
+            const accordionButtons = document.querySelectorAll("[data-bs-toggle='collapse']");
+            accordionButtons.forEach((button) => {
+                button.addEventListener("click", function() {
+                    const targetCollapseId = this.getAttribute("data-bs-target").replace("#", "");
+                    const isAccordionOpen = this.getAttribute("aria-expanded") === "true";
+
+                    if (isAccordionOpen) {
+                        // ตรวจสอบว่ามีค่า accordionCollapseStatus ใน localStorage
+                        const accordionCollapseStatus = localStorage.getItem("accordionCollapseStatus");
+                        if (accordionCollapseStatus) {
+                            // ถ้ามีค่าใน localStorage ให้ลบออก
+                            localStorage.removeItem("accordionCollapseStatus");
+                        }
+                    }
+                });
+            });
+
+
+        });
+    </script>
 </body>
 
 </html>

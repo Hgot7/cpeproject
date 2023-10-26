@@ -5,6 +5,13 @@ require_once "../connect.php";
 if (!isset($_SESSION['admin_login'])) {
   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
   header('Location: ../index.php');
+  exit();
+}
+if (isset($_SESSION['selectedYear'])) {
+  unset($_SESSION['selectedYear']);
+}
+if (isset($_SESSION['selectedTerm'])) {
+  unset($_SESSION['selectedTerm']);
 }
 
 //                                   delete data
@@ -18,7 +25,7 @@ if (isset($_GET['delete'])) {
   // รันคำสั่ง SQL
   if ($deletestmt->execute()) {
     echo "<script>alert('Data has been deleted successfully');</script>";
-    $_SESSION['success'] = "ลบข้อมูลเรียบร้อยแล้ว";
+    $_SESSION['success'] = "ลบข้อมูลเสร็จสิ้น";
     header("refresh:1; url=./Newsmanage.php");
   }
 }
@@ -83,24 +90,24 @@ if (isset($_GET['delete'])) {
               $data = $stmt->fetch(PDO::FETCH_ASSOC);
               ?>
               <div id="inputnews_head">
-                <label class="form-label">หัวข่าว</label>
-                <input type="text" class="form-control" name="inputnews_head" id="inputnews_head" value="<?php echo isset($_POST['inputnews_head']) ?  $_POST['inputnews_head'] : '' ?>" placeholder="หัวข้อข่าวสาร">
+                <label class="form-label">หัวข่าว<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="inputnews_head" id="inputnews_head" value="<?php echo isset($_POST['inputnews_head']) ?  $_POST['inputnews_head'] : '' ?>" placeholder="หัวข้อข่าวสาร" required>
               </div>
 
-              <label class="form-label">เนื้อหาข่าว</label>
-              <div class="form-floating" id="inputnews_text">
-                <textarea type="text" class="form-control" name="inputnews_text" id="inputnews_text" value="<?php echo isset($_POST['inputnews_text']) ?  $_POST['inputnews_text'] : '' ?>" placeholder="เนื้อหากำหนดการ"></textarea>
+              <label class="form-label">เนื้อหาข่าว<span style="color: red;"> *</span></label>
+              <div class="form-floating" id="inputnews_text" >
+                <textarea type="text" class="form-control" name="inputnews_text" id="inputnews_text" required value="<?php echo isset($_POST['inputnews_text']) ?  $_POST['inputnews_text'] : '' ?>" placeholder="เนื้อหากำหนดการ"></textarea>
                 <label for="floatingTextarea2">รายละเอียด</label>
               </div>
 
               <div id="inputyear">
-                <label class="form-label">ปีการศึกษา</label>
-                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="Year">
+                <label class="form-label">ปีการศึกษา<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษา" required>
               </div>
 
               <div id="inputterm">
-                <label class="form-label">ภาคการศึกษา</label>
-                <select id="selectbox" name="inputterm" class="form-select">
+                <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="inputterm" class="form-select" required>
                   <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
@@ -157,16 +164,33 @@ if (isset($_GET['delete'])) {
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                       if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+                        unset($_SESSION['selectedGroup']);
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+                        $selectedGroup = $_SESSION['selectedGroup'];
+                      }
                       $years = $conn->query("SELECT DISTINCT year FROM `news` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                          $yearValue = $datayear['year'];
+                          $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                            <?php echo $yearValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -176,14 +200,18 @@ if (isset($_GET['delete'])) {
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `news` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
-                        </option>
-                      <?php } ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
+                          </option>
+                        <?php } ?>
                     </select>
                   </div>
 
@@ -191,6 +219,11 @@ if (isset($_GET['delete'])) {
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
                   </div>
+                  
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
+                  </div>
+
                 </div>
               </form>
 
@@ -219,7 +252,7 @@ if (isset($_GET['delete'])) {
                 <table class="table">
                   <thead>
                     <tr>
-                      <th class="text-center" scope="col" style="width : 4%;">ลำดับที่</th>
+                      <th class="text-center" scope="col" style="width : 5em;">ลำดับที่</th>
                       <!-- <th scope="col">news_id</th> -->
                       <th scope="col">หัวข้อข่าว</th>
                       <th scope="col">เนื้อหาข่าว</th>

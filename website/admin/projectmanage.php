@@ -2,7 +2,21 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
 
+if (isset($_SESSION['selectedYear'])) {
+  unset($_SESSION['selectedYear']);
+}
+if (isset($_SESSION['selectedTerm'])) {
+  unset($_SESSION['selectedTerm']);
+}
+if (isset($_SESSION['selectedGroup'])) {
+  unset($_SESSION['selectedGroup']);
+}
 
 if (isset($_GET['delete'])) {
   $delete_id = $_GET['delete'];
@@ -19,10 +33,11 @@ if (isset($_GET['delete'])) {
   $deletestmt = $conn->prepare("DELETE FROM `project` WHERE project_id = :delete_id");
   $deletestmt->bindParam(':delete_id', $delete_id);
   if ($deletestmt->execute()) {
-    $_SESSION['success'] = "ลบข้อมูลรหัสกลุ่มโครงงาน ".$delete_id." เสร็จสมบูรณ์";
+    $_SESSION['success'] = "ลบข้อมูลรหัสกลุ่มโครงงาน " . $delete_id . " เสร็จสิ้น";
     if ($boundary_path && $boundary_path !== false) {
       $fileToDelete = "uploadfileBoundary/" . $boundary_path;
       if (is_file($fileToDelete)) {
+        echo "<script>hideLoading();</script>"; // เรียกใช้ฟังก์ชันเพื่อซ่อน Popup Loading
         if (unlink($fileToDelete)) {
           // $_SESSION['success'] = "ลบไฟล์เสร็จสมบูรณ์";
         } else {
@@ -37,14 +52,12 @@ if (isset($_GET['delete'])) {
       }
     }
     header("location: ./projectmanage.php");
-    
+    exit;
   } else {
     $_SESSION['success'] = "เกิดข้อผิดพลาดในการลบข้อมูล";
     header("location: ./projectmanage.php");
-    
+    exit;
   }
-
-
 }
 ?>
 <!DOCTYPE html>
@@ -81,7 +94,7 @@ if (isset($_GET['delete'])) {
       <sidebar_admin-component></sidebar_admin-component> <!-- component.js sidebar_admin-->
 
       <!-- Modal -->
-      <div class="modal fade" id="projectModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="projectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -89,17 +102,17 @@ if (isset($_GET['delete'])) {
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-              <form action="./add_dataproject.php" method="post" enctype="multipart/form-data">
-              <?php
-              $defaultSystemId = 1;
-                    $stmt = $conn->prepare("SELECT * FROM `defaultsystem` WHERE default_system_id = :id");
-                    $stmt->bindParam(':id', $defaultSystemId, PDO::PARAM_INT);
-                    $stmt->execute();
-                    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-                    ?>
+              <form action="./add_dataproject.php" method="post" enctype="multipart/form-data" onsubmit="showLoading('form1')">
+                <?php
+                $defaultSystemId = 1;
+                $stmt = $conn->prepare("SELECT * FROM `defaultsystem` WHERE default_system_id = :id");
+                $stmt->bindParam(':id', $defaultSystemId, PDO::PARAM_INT);
+                $stmt->execute();
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                ?>
                 <div id="inputproject_id">
-                  <label class="form-label">รหัสกลุ่มโครงงานนักศึกษา</label>
-                  <input type="text" class="form-control" name="inputproject_id" id="inputproject_id" value="<?php echo generateNewProjectId($conn, $data); ?>" placeholder="รหัสโครงงาน">
+                  <label class="form-label">รหัสกลุ่มโครงงานนักศึกษา<span style="color: red;"> *</span></label>
+                  <input type="text" class="form-control" name="inputproject_id" id="inputproject_id" value="<?php echo generateNewProjectId($conn, $data); ?>" placeholder="รหัสโครงงาน" required>
                   <?php
                   function generateNewProjectId($conn, $data)
                   {
@@ -134,36 +147,36 @@ if (isset($_GET['delete'])) {
 
                 </div>
 
-                <label class="form-label">ชื่อโครงงานภาษาไทย</label>
+                <label class="form-label">ชื่อโครงงานภาษาไทย<span style="color: red;"> *</span></label>
                 <div class="form-floating" id="inputproject_nameTH">
-                  <textarea class="form-control" name="inputproject_nameTH" id="inputproject_nameTH" placeholder="เนื้อหากำหนดการ"><?php echo $data['project_nameTH'] ?? ''; ?></textarea>
+                  <textarea class="form-control" name="inputproject_nameTH" id="inputproject_nameTH" placeholder="เนื้อหากำหนดการ" required><?php echo $data['project_nameTH'] ?? ''; ?></textarea>
                   <label for="inputproject_nameTH">ชื่อโครงงานภาษาไทยของนักศึกษา</label>
                 </div>
 
-                <label class="form-label">ชื่อโครงงานภาษาอังกฤษ</label>
+                <label class="form-label">ชื่อโครงงานภาษาอังกฤษ<span style="color: red;"> *</span></label>
                 <div class="form-floating" id="inputproject_nameENG">
-                  <textarea class="form-control" name="inputproject_nameENG" id="inputproject_nameENG" placeholder="เนื้อหากำหนดการ"><?php echo $data['project_nameENG'] ?? ''; ?></textarea>
+                  <textarea class="form-control" name="inputproject_nameENG" id="inputproject_nameENG" placeholder="เนื้อหากำหนดการ" required><?php echo $data['project_nameENG'] ?? ''; ?></textarea>
                   <label for="inputproject_nameENG">ชื่อโครงงานภาษาอังกฤษของนักศึกษา</label>
                 </div>
 
                 <div id="inputstudent_id1">
-                  <label class="form-label">นักศึกษา 1</label>
-                  <input type="number" class="form-control" name="inputstudent_id1" id="inputstudent_id1" placeholder="รหัสรหัสประจำตัวนักศึกษา 1">
+                  <label class="form-label">นักศึกษาคนที่ 1<span style="color: red;"> *</span></label>
+                  <input type="number" class="form-control" name="inputstudent_id1" id="inputstudent_id1" placeholder="หัสประจำตัวนักศึกษาคนที่ 1 (ไม่มีขีด)" required>
                 </div>
 
                 <div id="inputstudent_id2">
-                  <label class="form-label">นักศึกษา 2</label>
-                  <input type="number" class="form-control" name="inputstudent_id2" id="inputstudent_id2" placeholder="รหัสรหัสประจำตัวนักศึกษา 2">
+                  <label class="form-label">นักศึกษาคนที่ 2</label>
+                  <input type="number" class="form-control" name="inputstudent_id2" id="inputstudent_id2" placeholder="รหัสประจำตัวนักศึกษาคนที่ 2 (ไม่มีขีด)">
                 </div>
 
                 <div id="student_id3">
-                  <label class="form-label">นักศึกษา 3</label>
-                  <input type="number" class="form-control" name="inputstudent_id3" id="inputstudent_id3" placeholder="รหัสรหัสประจำตัวนักศึกษา 3">
+                  <label class="form-label">นักศึกษาคนที่ 3</label>
+                  <input type="number" class="form-control" name="inputstudent_id3" id="inputstudent_id3" placeholder="รหัสประจำตัวนักศึกษาคนที่ 3 (ไม่มีขีด)">
                 </div>
 
                 <div id="inputteacher_id1">
-                  <label class="form-label">อาจารย์ที่ปรึกษาหลัก</label>
-                  <select id="selectbox" name="inputteacher_id1" class="form-select">
+                  <label class="form-label">อาจารย์ที่ปรึกษาหลัก<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="inputteacher_id1" class="form-select" required>
                     <option value="">เลือกอาจารย์ที่ปรึกษาหลัก</option>
                     <?php
                     $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -203,8 +216,8 @@ if (isset($_GET['delete'])) {
                 </div>
 
                 <div id="inputreferee_id">
-                  <label class="form-label">ประธานกรรมการ</label>
-                  <select id="selectbox" name="inputreferee_id" class="form-select">
+                  <label class="form-label">ประธานกรรมการ<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="inputreferee_id" class="form-select" required>
                     <option value="">เลือกอาจารย์ประธานกรรมการ</option>
                     <?php
                     $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -223,8 +236,8 @@ if (isset($_GET['delete'])) {
                 </div>
 
                 <div id="inputreferee_id1">
-                  <label class="form-label">กรรมการ 1</label>
-                  <select id="selectbox" name="inputreferee_id1" class="form-select">
+                  <label class="form-label">กรรมการ 1<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="inputreferee_id1" class="form-select" required>
                     <option value="">เลือกอาจารย์กรรมการ 1</option>
                     <?php
                     $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -243,8 +256,8 @@ if (isset($_GET['delete'])) {
                 </div>
 
                 <div id="inputreferee_id2">
-                  <label class="form-label">กรรมการ 2</label>
-                  <select id="selectbox" name="inputreferee_id2" class="form-select">
+                  <label class="form-label">กรรมการ 2<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="inputreferee_id2" class="form-select" required>
                     <option value="">เลือกอาจารย์กรรมการ 2</option>
                     <?php
                     $teachers = $conn->query("SELECT * FROM `teacher`");
@@ -263,8 +276,8 @@ if (isset($_GET['delete'])) {
                 </div>
 
                 <div class="col-md-4">
-                  <label class="form-label" for="selectbox">กลุ่มเรียน</label>
-                  <select id="selectbox" name="input_group_id" class="form-select">
+                  <label class="form-label" for="selectbox">กลุ่มเรียน<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="input_group_id" class="form-select" required>
                     <option value="<?php echo null ?>">เลือกกลุ่มเรียน</option>
                     <?php
                     $groups = $conn->query("SELECT * FROM `groups` ORDER BY group_id DESC");
@@ -282,6 +295,13 @@ if (isset($_GET['delete'])) {
                 <div id="inputboundary_path">
                   <label class="form-label">ขอบเขตโครงงาน</label>
                   <input type="file" class="form-control" name="inputboundary_path" id="inputboundary_path" placeholder="ที่อยู่ไฟล์" accept=".pdf">
+                </div>
+
+                <div class="loading-overlay mt-2 mb-2" id="form1-loadingOverlay" style="display: none;">
+                  <div class="d-flex align-items-center text-center">
+                    <strong class="text-primary" role="status">กำลังอัปโหลดไฟล์...</strong>
+                    <div class="spinner-border text-primary ms-3" role="status"></div>
+                  </div>
                 </div>
 
                 <!-- <div id="inputgrade">
@@ -302,14 +322,14 @@ if (isset($_GET['delete'])) {
                 </div> -->
 
                 <div id="inputyear">
-                  <label class="form-label">ปีการศึกษา</label>
-                  <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="25xx">
+                  <label class="form-label">ปีการศึกษา<span style="color: red;"> *</span></label>
+                  <input type="number" class="form-control" name="inputyear" id="inputyear" value="<?php echo isset($data['year']) ?  $data['year'] : '' ?>" placeholder="ปีการศึกษาที่ลงทะเบียน" required>
                 </div>
 
                 <div id="inputterm">
-                  <label class="form-label">ภาคการศึกษา</label>
-                  <select id="selectbox" name="inputterm" class="form-select">
-                  <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
+                  <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                  <select id="selectbox" name="inputterm" class="form-select" required>
+                    <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                     <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                     <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>
                     <option value="3" <?php if ($data['term'] == "3") echo 'selected'; ?>>3</option>
@@ -329,30 +349,30 @@ if (isset($_GET['delete'])) {
 
       </div>
       <main class="col-md-9 ml-sm-auto col-lg-10 px-md-3 py-3">
-      <div class="row">
-        
+        <div class="row">
+
           <h1 class="h2" style="font-family: 'IBM Plex Sans Thai', sans-serif;">ข้อมูลโครงงานในรายวิชา</h1>
           <nav aria-label="breadcrumb">
-          <ol class="breadcrumb fs-5 mt-2 ms-3">
-          <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">จัดการข้อมูลโครงงาน</li>
-          </ol>
-        </nav>
+            <ol class="breadcrumb fs-5 mt-2 ms-3">
+              <li class="breadcrumb-item"><a href="./adminpage.php">หน้าหลัก</a></li>
+              <li class="breadcrumb-item active" aria-current="page">จัดการข้อมูลโครงงาน</li>
+            </ol>
+          </nav>
           <div class="col-12 col-xl-8 mb-4 mb-lg-0" style="width: 100%;">
-          <?php if (isset($_SESSION['error'])) { ?>
-            <div class="alert alert-danger" role="alert">
-              <?php
-              echo $_SESSION['error'];
-              unset($_SESSION['error']);
-              ?></div>
-          <?php  } ?>
-          <?php if (isset($_SESSION['success'])) { ?>
-            <div class="alert alert-success" role="alert">
-              <?php
-              echo $_SESSION['success'];
-              unset($_SESSION['success']);
-              ?></div>
-          <?php  } ?>
+            <?php if (isset($_SESSION['error'])) { ?>
+              <div class="alert alert-danger" role="alert">
+                <?php
+                echo $_SESSION['error'];
+                unset($_SESSION['error']);
+                ?></div>
+            <?php  } ?>
+            <?php if (isset($_SESSION['success'])) { ?>
+              <div class="alert alert-success" role="alert">
+                <?php
+                echo $_SESSION['success'];
+                unset($_SESSION['success']);
+                ?></div>
+            <?php  } ?>
             <div class="card shadow-sm">
               <div class="card-header justify-content-between align-items-center">
                 <form action="./projectmanage.php" method="POST">
@@ -362,16 +382,34 @@ if (isset($_GET['delete'])) {
                       <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                       <select class="form-select" name="filteryear">
                         <?php
+                        if (isset($_POST['resetfilter'])) {
+                          unset($_SESSION['selectedYear']);
+                          unset($_SESSION['selectedTerm']);
+                          unset($_SESSION['selectedGroup']);
+                        }
+                        if (isset($_POST['submitfilter'])) {
+                          $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                          $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                          $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                          $selectedYear =  $_SESSION['selectedYear'];
+                          $selectedTerm =   $_SESSION['selectedTerm'];
+                          $selectedGroup = $_SESSION['selectedGroup'];
+                        }
                         $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                         $years->execute();
+                        $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                         ?>
                         <option value="">เลือกปีการศึกษา</option>
                         <?php
-                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                          <option value="<?php echo $datayear['year']; ?>">
-                            <?php echo $datayear['year']; ?>
+                        while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                          $yearValue = $datayear['year'];
+                          $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                            <?php echo $yearValue; ?>
                           </option>
                         <?php } ?>
+
                       </select>
                     </div>
 
@@ -381,12 +419,17 @@ if (isset($_GET['delete'])) {
                         <?php
                         $terms = $conn->query("SELECT DISTINCT term FROM `project` ORDER BY term DESC");
                         $terms->execute();
+                        $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
+
                         ?>
                         <option value="">เลือกภาคการศึกษา</option>
                         <?php
-                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                          <option value="<?php echo $dataterm['term']; ?>">
-                            <?php echo $dataterm['term']; ?>
+                        while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                          $termValue = $dataterm['term'];
+                          $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                            <?php echo $termValue; ?>
                           </option>
                         <?php } ?>
                       </select>
@@ -397,27 +440,38 @@ if (isset($_GET['delete'])) {
                       <select class="form-select" name="filtergroup">
                         <?php
                         $groups = $conn->prepare("SELECT groups.group_name 
-                         FROM `groups`
-                         LEFT JOIN `project` ON groups.group_id = project.group_id
-                         GROUP BY groups.group_id, groups.group_name
-                         HAVING COUNT(project.group_id) >= 1
-                         ORDER BY groups.group_name DESC");
+     FROM `groups`
+     LEFT JOIN `project` ON groups.group_id = project.group_id
+     GROUP BY groups.group_id, groups.group_name
+     HAVING COUNT(project.group_id) >= 1
+     ORDER BY groups.group_name DESC");
 
                         $groups->execute();
+                        $selectedGroup = isset($_SESSION['selectedGroup']) ? $_SESSION['selectedGroup'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
+
                         ?>
                         <option value="">เลือกกลุ่มเรียน</option>
                         <?php
-                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) { ?>
-                          <option value="<?php echo $datagroup['group_name']; ?>">
-                            <?php echo $datagroup['group_name']; ?>
+                        while ($datagroup = $groups->fetch(PDO::FETCH_ASSOC)) {
+                          $groupValue = $datagroup['group_name'];
+                          $isGroupSelected = ($selectedGroup == $groupValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                        ?>
+                          <option value="<?php echo $groupValue; ?>" <?php echo $isGroupSelected; ?>>
+                            <?php echo $groupValue; ?>
                           </option>
                         <?php } ?>
                       </select>
                     </div>
 
+
                     <div class="col-auto d-flex align-items-end justify-content-start">
                       <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
                     </div>
+
+                    <div class="col-auto d-flex align-items-end justify-content-start">
+                      <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
+                    </div>
+
 
                   </div>
                 </form>
@@ -443,7 +497,7 @@ if (isset($_GET['delete'])) {
                   <table class="table">
                     <thead>
                       <tr>
-                      <th class="text-center" scope="col" style="width : 4%;">ลำดับที่</th>
+                        <th class="text-center" scope="col" style="width : 4%;">ลำดับที่</th>
                         <th scope="col">รหัสกลุ่มโครงงาน</th>
                         <th scope="col">ชื่อโครงงานภาษาไทย</th>
                         <th scope="col">ชื่อโครงงานภาษาอังกฤษ</th>
@@ -535,6 +589,9 @@ if (isset($_GET['delete'])) {
                           case "อาจารย์":
                             return $Position = "อ.";
                             break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
                           case "ดร.":
                             return $Position = "ดร.";
                             break;
@@ -545,15 +602,15 @@ if (isset($_GET['delete'])) {
                       //start
                       // filter term and year
                       if (isset($_POST['submitfilter'])) {
-                        $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
-                        $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
-                        $selectedGroup = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        // $selectedYear = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        // $selectedTerm = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        // $selectedGroup = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
 
                         if (empty($selectedYear) && empty($selectedTerm) && empty($selectedGroup)) {
                           $sql = "SELECT * FROM `project`";
                           $stmt = $conn->prepare($sql);
                           $stmt->execute();
-                          $projects = $stmt->fetchAll();
+                          $filteredData = $stmt->fetchAll();
                         } elseif (empty($selectedYear) && !empty($selectedTerm) && !empty($selectedGroup)) {
                           // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
                           $sql = "SELECT project.*
@@ -566,7 +623,7 @@ if (isset($_GET['delete'])) {
                           $stmt->bindParam(':term', $selectedTerm);
                           $stmt->bindParam(':group_name', $selectedGroup);
                           $stmt->execute();
-                          $projects = $stmt->fetchAll();
+                          $filteredData = $stmt->fetchAll();
                         } elseif (!empty($selectedYear) && !empty($selectedTerm) && empty($selectedGroup)) {
                           // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
                           $sql = "SELECT project.*
@@ -577,9 +634,36 @@ if (isset($_GET['delete'])) {
                           $stmt = $conn->prepare($sql);
                           $stmt->bindParam(':year', $selectedYear);
                           $stmt->bindParam(':term', $selectedTerm);
+                          $stmt->execute();
+                          $filteredData = $stmt->fetchAll();
+                        } elseif (!empty($selectedYear) && empty($selectedTerm) && !empty($selectedGroup)) {
+                          // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
+                          $sql = "SELECT project.*
+                          FROM `project`
+                          LEFT JOIN `groups` ON project.group_id = groups.group_id
+                          WHERE year LIKE :year
+                          AND (groups.group_name LIKE :group_name AND :group_name <> '')";
+                          $stmt = $conn->prepare($sql);
+                          $stmt->bindParam(':year', $selectedYear);
+                          $stmt->bindParam(':group_name', $selectedGroup);
 
                           $stmt->execute();
-                          $projects = $stmt->fetchAll();
+                          $filteredData = $stmt->fetchAll();
+                        } elseif (!empty($selectedYear) && !empty($selectedTerm) && !empty($selectedGroup)) {
+                          // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
+                          $sql = "SELECT project.*
+                          FROM `project`
+                          LEFT JOIN `groups` ON project.group_id = groups.group_id
+                          WHERE year LIKE :year
+                          AND term LIKE :term
+                          AND (groups.group_name LIKE :group_name AND :group_name <> '')";
+                          $stmt = $conn->prepare($sql);
+                          $stmt->bindParam(':year', $selectedYear);
+                          $stmt->bindParam(':term', $selectedTerm);
+                          $stmt->bindParam(':group_name', $selectedGroup);
+
+                          $stmt->execute();
+                          $filteredData = $stmt->fetchAll();
                         } else {
                           // ถ้ามีการเลือกเงื่อนไขในการค้นหาให้ดำเนินการตามปกติ
                           $sql = "SELECT project.*
@@ -594,66 +678,70 @@ if (isset($_GET['delete'])) {
                           $stmt->bindParam(':group_name', $selectedGroup);
 
                           $stmt->execute();
-                          $projects = $stmt->fetchAll();
+                          $filteredData = $stmt->fetchAll();
                         }
                         $index = 1;
-                        foreach ($projects as $project) {
-                          //นักศึกษา 1
-                          $student1 = giveStudentById($conn, $project['student_id1']);
-                          //นักศึกษา 2
-                          $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
-                          //นักศึกษา 3
-                          $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
-                          //อาจารย์ที่ปรึกษาหลัก
-                          $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
-                          //อาจารย์ที่ปรึกษาร่วม
-                          $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
-                          //ประธานกรรมการ
-                          $referee_id = giveTeacherById($conn, $project['referee_id']);
-                          //กรรมการ 1
-                          $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
-                          //กรรมการ 2
-                          $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
-                          //เอกสารโปสเตอร์
-                          $fullDocument1 = giveFileById($conn, $project['project_id'],13);
-                          //เอกสารรูปเล่มฉบับเต็ม
-                          $fullDocument2 = giveFileById($conn, $project['project_id'] ,14);
-                          //กลุ่มเรียน
-                          $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
+                        if (!$filteredData) {
+                          echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
+                        } else {
+                          foreach ($filteredData as $project) {
+                            //นักศึกษา 1
+                            $student1 = giveStudentById($conn, $project['student_id1']);
+                            //นักศึกษา 2
+                            $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
+                            //นักศึกษา 3
+                            $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
+                            //อาจารย์ที่ปรึกษาหลัก
+                            $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
+                            //อาจารย์ที่ปรึกษาร่วม
+                            $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
+                            //ประธานกรรมการ
+                            $referee_id = giveTeacherById($conn, $project['referee_id']);
+                            //กรรมการ 1
+                            $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
+                            //กรรมการ 2
+                            $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
+                            //เอกสารโปสเตอร์
+                            $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
+                            //เอกสารรูปเล่มฉบับเต็ม
+                            $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
+                            //กลุ่มเรียน
+                            $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
                       ?>
-                          <tr>
-                            <th scope="row"><?php echo $index++; ?></th>
-                            <th scope="row"><?php echo $project['project_id']; ?></th>
-                            <td><?php echo $project['project_nameTH']; ?></td>
-                            <td><?php echo $project['project_nameENG']; ?></td>
-                            <td><?php echo $student1['firstname']; ?></td>
-                            <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
-                            <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
-                            <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
-                            <td><?php if (empty($teacher2)) {
-                                  echo "";
-                                } else {
-                                  echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
-                                } ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
-                            <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
+                            <tr>
+                              <th scope="row"><?php echo $index++; ?></th>
+                              <th scope="row"><?php echo $project['project_id']; ?></th>
+                              <td><?php echo $project['project_nameTH']; ?></td>
+                              <td><?php echo $project['project_nameENG']; ?></td>
+                              <td><?php echo $student1['firstname']; ?></td>
+                              <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
+                              <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
+                              <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
+                              <td><?php if (empty($teacher2)) {
+                                    echo "";
+                                  } else {
+                                    echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
+                                  } ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
+                              <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                            <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                            <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
-                            <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
+                              <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                              <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
+                              <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
-                            
-                            <td><?php echo $project['year']; ?></td>
-                            <td><?php echo $project['term']; ?></td>
-                            <td>
-                              <a href="Stduploadfile.php?id=<?php echo $project['project_id']; ?>" class="btn btn-info text-white">ความคืบหน้า</a>
-                              <a href="editproject.php?id=<?php echo $project['project_id']; ?>" class="btn btn-warning mt-1">แก้ไขข้อมูล</a>
-                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $project['project_id']; ?>" class="btn btn-danger mt-1">ลบข้อมูล</a>
-                            </td>
-                          </tr>
-                        <?php }
+
+                              <td><?php echo $project['year']; ?></td>
+                              <td><?php echo $project['term']; ?></td>
+                              <td>
+                                <a href="Stduploadfile.php?id=<?php echo $project['project_id']; ?>" class="btn btn-info text-white">ความคืบหน้า</a>
+                                <a href="editproject.php?id=<?php echo $project['project_id']; ?>" class="btn btn-warning mt-1">แก้ไขข้อมูล</a>
+                                <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $project['project_id']; ?>" class="btn btn-danger mt-1">ลบข้อมูล</a>
+                              </td>
+                            </tr>
+                          <?php }
+                        }
                       } elseif (isset($_POST['submitsearch'])) {
                         $SearchText = $_POST['search'];
                         $isStudent = strpos($SearchText, '(นักศึกษา)') !== false;
@@ -750,62 +838,62 @@ if (isset($_GET['delete'])) {
                         if (!$projects) {
                           echo "<p><td colspan='20' class='text-center'>No data available</td></p>";
                         } else {
-                        foreach ($projects as $project) {
-                          //นักศึกษา 1
-                          $student1 = giveStudentById($conn, $project['student_id1']);
-                          //นักศึกษา 2
-                          $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
-                          //นักศึกษา 3
-                          $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
-                          //อาจารย์ที่ปรึกษาหลัก
-                          $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
-                          //อาจารย์ที่ปรึกษาร่วม
-                          $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
-                          //ประธานกรรมการ
-                          $referee_id = giveTeacherById($conn, $project['referee_id']);
-                          //กรรมการ 1
-                          $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
-                          //กรรมการ 2
-                          $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
-                          //กลุ่มเรียน
-                          //เอกสารโปสเตอร์
-                          $fullDocument1 = giveFileById($conn, $project['project_id'],13);
-                          //เอกสารรูปเล่มฉบับเต็ม
-                          $fullDocument2 = giveFileById($conn, $project['project_id'] ,14);
-                          $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
-                        ?>
-                          <tr>
-                            <th scope="row"><?php echo $index++; ?></th>
-                            <th scope="row"><?php echo $project['project_id']; ?></th>
-                            <td><?php echo $project['project_nameTH']; ?></td>
-                            <td><?php echo $project['project_nameENG']; ?></td>
-                            <td><?php echo $student1['firstname']; ?></td>
-                            <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
-                            <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
-                            <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
-                            <td><?php if (empty($teacher2)) {
-                                  echo "";
-                                } else {
-                                  echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
-                                } ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
-                            <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
-                            <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
+                          foreach ($projects as $project) {
+                            //นักศึกษา 1
+                            $student1 = giveStudentById($conn, $project['student_id1']);
+                            //นักศึกษา 2
+                            $student2 = ($project['student_id2']) ? giveStudentById($conn, $project['student_id2']) : null;
+                            //นักศึกษา 3
+                            $student3 = ($project['student_id3']) ? giveStudentById($conn, $project['student_id3']) : null;
+                            //อาจารย์ที่ปรึกษาหลัก
+                            $teacher1 = giveTeacherById($conn, $project['teacher_id1']);
+                            //อาจารย์ที่ปรึกษาร่วม
+                            $teacher2 = ($project['teacher_id2']) ? giveTeacherById($conn, $project['teacher_id2']) : null;
+                            //ประธานกรรมการ
+                            $referee_id = giveTeacherById($conn, $project['referee_id']);
+                            //กรรมการ 1
+                            $referee_id1 = giveTeacherById($conn, $project['referee_id1']);
+                            //กรรมการ 2
+                            $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
+                            //กลุ่มเรียน
+                            //เอกสารโปสเตอร์
+                            $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
+                            //เอกสารรูปเล่มฉบับเต็ม
+                            $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
+                            $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
+                          ?>
+                            <tr>
+                              <th scope="row"><?php echo $index++; ?></th>
+                              <th scope="row"><?php echo $project['project_id']; ?></th>
+                              <td><?php echo $project['project_nameTH']; ?></td>
+                              <td><?php echo $project['project_nameENG']; ?></td>
+                              <td><?php echo $student1['firstname']; ?></td>
+                              <td><?php echo $student2 ? $student2['firstname'] : ''; ?></td>
+                              <td><?php echo $student3 ? $student3['firstname'] : ''; ?></td>
+                              <td><?php echo giveTeacherPositionById($teacher1['position']) . $teacher1['firstname']; ?></td>
+                              <td><?php if (empty($teacher2)) {
+                                    echo "";
+                                  } else {
+                                    echo giveTeacherPositionById($teacher2['position']) . $teacher2['firstname'];
+                                  } ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id['position']) . $referee_id['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id1['position']) . $referee_id1['firstname']; ?></td>
+                              <td><?php echo giveTeacherPositionById($referee_id2['position']) . $referee_id2['firstname']; ?></td>
+                              <td><?php echo $group_id ? $group_id['group_name'] : ''; ?></td>
 
-                            <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
-                            <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
-                            <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
+                              <td><a href="<?php echo './uploadfileBoundary/' . $project['boundary_path']; ?>" target="_blank"><?php echo $project['boundary_path']; ?></a></td>
+                              <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
+                              <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
-                            
-                            <td><?php echo $project['year']; ?></td>
-                            <td><?php echo $project['term']; ?></td>
-                            <td>
-                              <a href="Stduploadfile.php?id=<?php echo $project['project_id']; ?>" class="btn btn-info text-white">ความคืบหน้า</a>
-                              <a href="editproject.php?id=<?php echo $project['project_id']; ?>" class="btn btn-warning mt-1">แก้ไขข้อมูล</a>
-                              <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $project['project_id']; ?>" class="btn btn-danger mt-1">ลบข้อมูล</a>
-                            </td>
-                          </tr>
+
+                              <td><?php echo $project['year']; ?></td>
+                              <td><?php echo $project['term']; ?></td>
+                              <td>
+                                <a href="Stduploadfile.php?id=<?php echo $project['project_id']; ?>" class="btn btn-info text-white">ความคืบหน้า</a>
+                                <a href="editproject.php?id=<?php echo $project['project_id']; ?>" class="btn btn-warning mt-1">แก้ไขข้อมูล</a>
+                                <a onclick="return confirm('Are you sure you want to delete?');" href="?delete=<?php echo $project['project_id']; ?>" class="btn btn-danger mt-1">ลบข้อมูล</a>
+                              </td>
+                            </tr>
                           <?php }
                         }
                       } elseif (isset($_POST['viewAll'])) {
@@ -836,9 +924,9 @@ if (isset($_GET['delete'])) {
                             //กรรมการ 2
                             $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
                             //เอกสารโปสเตอร์
-                            $fullDocument1 = giveFileById($conn, $project['project_id'],13);
+                            $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
                             //เอกสารรูปเล่มฉบับเต็ม
-                            $fullDocument2 = giveFileById($conn, $project['project_id'] ,14);
+                            $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
                             //กลุ่มเรียน
                             $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
                           ?>
@@ -865,7 +953,7 @@ if (isset($_GET['delete'])) {
                               <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
                               <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
-                              
+
                               <td><?php echo $project['year']; ?></td>
                               <td><?php echo $project['term']; ?></td>
                               <td>
@@ -902,10 +990,10 @@ if (isset($_GET['delete'])) {
                             //กรรมการ 2
                             $referee_id2 = giveTeacherById($conn, $project['referee_id2']);
                             //เอกสารโปสเตอร์
-                            $fullDocument1 = giveFileById($conn, $project['project_id'],13);
+                            $fullDocument1 = giveFileById($conn, $project['project_id'], 13);
                             //เอกสารรูปเล่มฉบับเต็ม
-                            $fullDocument2 = giveFileById($conn, $project['project_id'] ,14);
-                            
+                            $fullDocument2 = giveFileById($conn, $project['project_id'], 14);
+
                             //กลุ่มเรียน
                             $group_id = ($project['group_id']) ? giveGroupById($conn, $project['group_id']) : null;
                           ?>
@@ -932,7 +1020,7 @@ if (isset($_GET['delete'])) {
                               <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument1; ?>" target="_blank"><?php echo $fullDocument1; ?></a></td>
                               <td><a href="<?php echo '.././student/fileUpload/' . $fullDocument2; ?>" target="_blank"><?php echo $fullDocument2; ?></a></td>
 
-                              
+
                               <td><?php echo $project['year']; ?></td>
                               <td><?php echo $project['term']; ?></td>
                               <td>
@@ -958,7 +1046,7 @@ if (isset($_GET['delete'])) {
               </div>
             </div>
           </div>
-      </div>
+        </div>
       </main>
 
     </div>
@@ -969,6 +1057,19 @@ if (isset($_GET['delete'])) {
 
   <script src="./search_data/searchProjectAdmin.js"></script>
 
+  <script>
+    // animetion uploading    
+    function showLoading(formId) {
+      // แสดง Popup Loading เฉพาะฟอร์มที่ถูกส่ง
+      document.getElementById(formId + "-loadingOverlay").style.display = "block";
+      return true; // ต้อง return true เพื่อให้ฟอร์มส่งข้อมูลไปยัง action
+    }
+
+    function hideLoading(formId) {
+      // ซ่อน Popup Loading เมื่ออัปโหลดสำเร็จ
+      document.getElementById(formId + "-loadingOverlay").style.display = "none";
+    }
+  </script>
 
 </body>
 

@@ -6,6 +6,7 @@ require_once "../connect.php";
 if (!isset($_SESSION['admin_login'])) {
   $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
   header('Location: ../index.php');
+  exit();
 }
 ?>
 
@@ -104,7 +105,7 @@ if (!isset($_SESSION['admin_login'])) {
         <div class="row mb-4">
           <div class="col-12 col-xl-12 mb-4 mb-lg-0">
             <div class="card shadow-sm">
-              <h4 class="card-header font-weight-bold text-primary">สถานะโปรเจคที่กำลังดำเนินการในปัจจุบัน</h4>
+              <h4 class="card-header font-weight-bold text-primary">สถานะโครงงานที่กำลังดำเนินการในปัจจุบัน</h4>
               <div class="card-body">
                 <div class="table-responsive">
                   <table class="table">
@@ -152,8 +153,17 @@ if (!isset($_SESSION['admin_login'])) {
                       function giveTeacherPositionById($Position)
                       {
                         switch ($Position) {
+                          case "ศาสตราจารย์":
+                            return $Position = "ศ.";
+                            break;
+                          case "ศาสตราจารย์ ดร.":
+                            return $Position = "ศ.ดร.";
+                            break;
                           case "รองศาสตราจารย์":
                             return $Position = "รศ.";
+                            break;
+                          case "รองศาสตราจารย์ ดร.":
+                            return $Position = "รศ.ดร.";
                             break;
                           case "ผู้ช่วยศาสตราจารย์":
                             return $Position = "ผศ.";
@@ -163,6 +173,9 @@ if (!isset($_SESSION['admin_login'])) {
                             break;
                           case "อาจารย์":
                             return $Position = "อ.";
+                            break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
                             break;
                           case "ดร.":
                             return $Position = "ดร.";

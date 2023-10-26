@@ -16,6 +16,39 @@ if (isset($_POST['submit'])) {
   $inputgroup = $_POST['inputgroup'];
   $inputgrade = $_POST['inputgrade'];
    // check empty is null
+
+   if (empty($inputstd_id)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+  if (empty($inputname)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+  if (empty($inputlastname)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+  if (empty($inputyear)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+  if (empty($inputterm)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+  if (empty($inputgroup)) {
+    $_SESSION['error'] = 'กรุณากรอกข้อมูลให้ครบถ้วน';
+    header("location: studentmanage.php");
+    exit();
+  }
+
+
   if(empty($inputpassword)){
     $passwordHash = null;
   }else {

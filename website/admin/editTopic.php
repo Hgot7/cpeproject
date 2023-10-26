@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+    $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+    header('Location: ../index.php');
+    exit();
+  }
+
 if (isset($_POST['update'])) {
     $topic_id = $_POST['id'];
     $topic_name = $_POST['topic_name'];
@@ -126,13 +132,13 @@ if (isset($_POST['update'])) {
                         </div> -->
 
                             <div id="topic_name">
-                                <label class="form-label">ชื่อหัวข้อการประเมิน</label>
-                                <input type="text" class="form-control" name="topic_name" id="topic_name" value="<?php echo isset($topics['topic_name']) ? $topics['topic_name'] : ''; ?>" placeholder="ชื่อหัวข้อการประเมิน">
+                                <label class="form-label">ชื่อหัวข้อการประเมิน<span style="color: red;"> *</span></label>
+                                <input type="text" class="form-control" name="topic_name" id="topic_name" value="<?php echo isset($topics['topic_name']) ? $topics['topic_name'] : ''; ?>" placeholder="ชื่อหัวข้อการประเมิน" required>
                             </div>
 
                             <div id="topic_section_id">
-                                <label class="form-label">ส่วนของการประเมิน</label>
-                                <select name="topic_section_id" class="form-select">
+                                <label class="form-label">ส่วนของการประเมิน<span style="color: red;"> *</span></label>
+                                <select name="topic_section_id" class="form-select" required>
                                     <?php
                                     $topicSections = $conn->query("SELECT * FROM `topicsection` ORDER BY topic_section_id DESC");
                                     $topicSections->execute();
@@ -157,8 +163,8 @@ if (isset($_POST['update'])) {
                             </div> -->
 
                             <div id="topic_status">
-                                <label id="selectbox" class="form-label">สถานะการใช้งาน</label>
-                                <select name="topic_status" class="form-select">
+                                <label id="selectbox" class="form-label">สถานะการใช้งาน<span style="color: red;"> *</span></label>
+                                <select name="topic_status" class="form-select" required>
                                     <option value="0" <?php if ($topics['topic_status'] == 0) echo 'selected'; ?>>ปิดการใช้งาน</option>
                                     <option value="1" <?php if ($topics['topic_status'] == 1) echo 'selected'; ?>>เปิดการใช้งาน</option>
                                 </select>

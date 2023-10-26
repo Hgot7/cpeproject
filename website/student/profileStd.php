@@ -70,16 +70,16 @@ $data = $stmt->fetch();
                             <div class="modal-body">
                                 <form action="./NewPasswordStudent.php" method="post" enctype="multipart/form-data">
                                 <div class="col-12 mb-1">
-                                    <label for="lastName" class="form-label">รหัสผ่านเก่า</label>
-                                    <input type="password" class="form-control" name="oldpassword">
+                                    <label for="lastName" class="form-label">รหัสผ่านปัจจุบัน</label>
+                                    <input type="password" placeholder="ใส่รหัสผ่านปัจจุบันที่ใช้งานอยู่" class="form-control" name="oldpassword">
                                 </div>
                                 <div class="col-12 mb-1">
-                                    <label for="lastName" class="form-label">รหัสใหม่</label>
-                                    <input type="password" class="form-control" name="newpassword" >
+                                    <label for="lastName" class="form-label">รหัสผ่านใหม่</label>
+                                    <input type="password" placeholder="ใส่รหัสผ่านที่ต้องการความยาวตั้งแต่ 6-20 ตัวอักษร" class="form-control" name="newpassword" >
                                 </div>
                                 <div class="col-12 mb-1">
                                     <label for="lastName" class="form-label">ยืนยันรหัสใหม่</label>
-                                    <input type="password" class="form-control" name="cnewpassword" >
+                                    <input type="password" placeholder="ยืนยันรหัสผ่านใหม่ให้เหมือนกับรหัสผ่านใหม่ด้านบน" class="form-control" name="cnewpassword" >
                                 </div>
 
                             </div>
@@ -146,8 +146,8 @@ $data = $stmt->fetch();
                                 </div>
 
                                 <div class="col-12">
-                                    <label for="address2" class="form-label">เบอร์โทร</label>
-                                    <input type="text" class="form-control" id="address2" placeholder="Apartment or suite" value="<?php echo $data['phone']; ?>" readonly>
+                                    <label for="address2" class="form-label">เบอร์โทรศัพท์</label>
+                                    <input type="text" class="form-control" id="address2" placeholder="เบอร์โทรศัพท์" value="<?php echo $data['phone']; ?>" readonly>
                                 </div>
 
                                 <div class="col-12">

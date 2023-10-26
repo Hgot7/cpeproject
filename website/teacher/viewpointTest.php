@@ -9,6 +9,13 @@ if (!isset($_SESSION['teacher_login'])) {
   exit();
 }
 
+if (isset($_SESSION['selectedYear'])) {
+  unset($_SESSION['selectedYear']);
+}
+if (isset($_SESSION['selectedTerm'])) {
+  unset($_SESSION['selectedTerm']);
+}
+
 function giveTeacherById($conn, $project_id)
 {
   $sql = "SELECT * FROM `file` WHERE project_id = :project_id and file_status = :file_status";
@@ -113,14 +120,32 @@ function giveStatusById($conn, $project_id)
                     <label for="filterYear" class="form-label">ฟิลเตอร์ปีการศึกษา</label>
                     <select class="form-select" name="filteryear">
                       <?php
+                      if (isset($_POST['resetfilter'])) {
+                        unset($_SESSION['selectedYear']);
+                        unset($_SESSION['selectedTerm']);
+                        unset($_SESSION['selectedGroup']);
+                      }
+                      if (isset($_POST['submitfilter'])) {
+                        $_SESSION['selectedYear'] = isset($_POST['filteryear']) ? $_POST['filteryear'] : null;
+                        $_SESSION['selectedTerm'] = isset($_POST['filterterm']) ? $_POST['filterterm'] : null;
+                        $_SESSION['selectedGroup'] = isset($_POST['filtergroup']) ? $_POST['filtergroup'] : null;
+                        $selectedYear =  $_SESSION['selectedYear'];
+                        $selectedTerm =   $_SESSION['selectedTerm'];
+                        $selectedGroup = $_SESSION['selectedGroup'];
+                      }
+
                       $years = $conn->query("SELECT DISTINCT year FROM `project` ORDER BY year DESC");
                       $years->execute();
+                      $selectedYear = isset($_SESSION['selectedYear']) ? $_SESSION['selectedYear'] : null;
                       ?>
                       <option value="">เลือกปีการศึกษา</option>
                       <?php
-                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $datayear['year']; ?>">
-                          <?php echo $datayear['year']; ?>
+                      while ($datayear = $years->fetch(PDO::FETCH_ASSOC)) {
+                        $yearValue = $datayear['year'];
+                        $isYearSelected = ($selectedYear == $yearValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $yearValue; ?>" <?php echo $isYearSelected; ?>>
+                          <?php echo $yearValue; ?>
                         </option>
                       <?php } ?>
                     </select>
@@ -132,12 +157,16 @@ function giveStatusById($conn, $project_id)
                       <?php
                       $terms = $conn->query("SELECT DISTINCT term FROM `project` ORDER BY term DESC");
                       $terms->execute();
+                      $selectedTerm = isset($_SESSION['selectedTerm']) ? $_SESSION['selectedTerm'] : null; // ดึงค่าที่ถูกเลือกจาก Session Variables
                       ?>
                       <option value="">เลือกภาคการศึกษา</option>
                       <?php
-                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) { ?>
-                        <option value="<?php echo $dataterm['term']; ?>">
-                          <?php echo $dataterm['term']; ?>
+                      while ($dataterm = $terms->fetch(PDO::FETCH_ASSOC)) {
+                        $termValue = $dataterm['term'];
+                        $isTermSelected = ($selectedTerm == $termValue) ? 'selected' : ''; // เพิ่มเงื่อนไขเช็คค่า selected
+                      ?>
+                        <option value="<?php echo $termValue; ?>" <?php echo $isTermSelected; ?>>
+                          <?php echo $termValue; ?>
                         </option>
                       <?php } ?>
                     </select>
@@ -145,6 +174,10 @@ function giveStatusById($conn, $project_id)
 
                   <div class="col-auto d-flex align-items-end justify-content-start">
                     <button type="submit" id="submitfilter" name="submitfilter" class="btn btn-success">ฟิลเตอร์</button>
+                  </div>
+
+                  <div class="col-auto d-flex align-items-end justify-content-start">
+                    <button type="submit" id="resetfilter" name="resetfilter" class="btn btn-warning">รีเซ็ตฟิลเตอร์</button>
                   </div>
 
                 </div>
@@ -156,7 +189,7 @@ function giveStatusById($conn, $project_id)
                 <table class="table">
                   <thead>
                     <tr>
-                    <th scope="col" style="width: 5em;">ลำดับที่</th>
+                      <th scope="col" style="width: 5em;">ลำดับที่</th>
                       <th class="text-center" scope="col">รหัสกลุ่มโครงงาน</th>
                       <th scope="col" style="width : 30%;">ชื่อโครงงาน</th>
                       <th class="text-center" scope="col">ปีการศึกษา</th>
@@ -251,73 +284,9 @@ function giveStatusById($conn, $project_id)
                         if (empty($filteredData)) {
                           echo "<tr><td colspan='20' class='text-center'>No data available</td></tr>";
                         } else {
-                        $index = 1;
-                        foreach ($filteredData as $data) {
-                    ?>
-                          <tr>
-                            <th scope="row"><?php echo $index++; ?></th>
-                            <td><?php echo $data['project_id']; ?></td>
-                            <td><?php echo ($data['project_nameTH']); ?></td>
-                            <td><?php echo ($data['year']); ?></td>
-                            <td><?php echo ($data['term']); ?></td>
-                            <?php
-                            $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
-
-                            $sql = "SELECT * FROM `project`
-        WHERE year = (SELECT year FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
-        AND term = (SELECT term FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
-        AND project_id = :project_id";
-                            $stmt = $conn->prepare($sql);
-                            $stmt->bindParam(':default_system_id', $defaultSystemId);
-                            $stmt->bindParam(':project_id', $data['project_id']);
-                            $stmt->execute();
-                            $default = $stmt->fetch();
-                            ?>
-
-                            <td>
-                              <?php if (empty($default)) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-danger"></i>
-                                    <i>หมดเวลาการประเมิน</i>
-                                  </div>
-                                </div>
-                              <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-success"></i>
-                                    <i>ประเมินเสร็จสิ้น</i>
-                                  </div>
-                                </div>
-                              <?php endif; ?>
-                            </td>
-
-
-                            <td><a href="pointTest.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white">ประเมิน</a></td>
-                          </tr>
-                          <?php }
-                        }
-                      }elseif (isset($_POST['viewAll'])) {
-                        $sql = "SELECT *
-                        FROM `project`
-                        WHERE teacher_id1 = :id
-                           OR teacher_id2 = :id
-                           OR referee_id = :id
-                           OR referee_id1 = :id
-                           OR referee_id2 = :id
-                        ORDER BY year DESC, term DESC;
-                        ";
-                        $stmt = $conn->prepare($sql);
-                        $stmt->bindParam(':id', $_SESSION['teacher_id']);
-                        $stmt->execute();
-                        $datas = $stmt->fetchAll();
-
-                        if (empty($datas)) {
-                          echo "<tr><td colspan='20' class='text-center'>No data available</td></tr>";
-                        } else {
                           $index = 1;
-                          foreach ($datas as $data) {
-                          ?>
+                          foreach ($filteredData as $data) {
+                    ?>
                             <tr>
                               <th scope="row"><?php echo $index++; ?></th>
                               <td><?php echo $data['project_id']; ?></td>
@@ -325,44 +294,43 @@ function giveStatusById($conn, $project_id)
                               <td><?php echo ($data['year']); ?></td>
                               <td><?php echo ($data['term']); ?></td>
                               <?php
-                            $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
+                              $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
 
-                            $sql = "SELECT * FROM `project`
+                              $sql = "SELECT * FROM `project`
         WHERE year = (SELECT year FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
         AND term = (SELECT term FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
         AND project_id = :project_id";
-                            $stmt = $conn->prepare($sql);
-                            $stmt->bindParam(':default_system_id', $defaultSystemId);
-                            $stmt->bindParam(':project_id', $data['project_id']);
-                            $stmt->execute();
-                            $default = $stmt->fetch();
-                            ?>
+                              $stmt = $conn->prepare($sql);
+                              $stmt->bindParam(':default_system_id', $defaultSystemId);
+                              $stmt->bindParam(':project_id', $data['project_id']);
+                              $stmt->execute();
+                              $default = $stmt->fetch();
+                              ?>
 
-                            <td>
-                              <?php if (empty($default)) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-danger"></i>
-                                    <i>หมดเวลาการประเมิน</i>
+                              <td>
+                                <?php if (empty($default)) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-danger"></i>
+                                      <i>หมดเวลาการประเมิน</i>
+                                    </div>
                                   </div>
-                                </div>
-                              <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-success"></i>
-                                    <i>ประเมินเสร็จสิ้น</i>
+                                <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-success"></i>
+                                      <i>ประเมินเสร็จสิ้น</i>
+                                    </div>
                                   </div>
-                                </div>
-                              <?php endif; ?>
-                            </td>
+                                <?php endif; ?>
+                              </td>
+
+
                               <td><a href="pointTest.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white">ประเมิน</a></td>
                             </tr>
-                    <?php
-                          }
+                          <?php }
                         }
-
-
-                      }else {
+                      } elseif (isset($_POST['viewAll'])) {
                         $sql = "SELECT *
                         FROM `project`
                         WHERE teacher_id1 = :id
@@ -390,36 +358,99 @@ function giveStatusById($conn, $project_id)
                               <td><?php echo ($data['year']); ?></td>
                               <td><?php echo ($data['term']); ?></td>
                               <?php
-                            $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
+                              $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
 
-                            $sql = "SELECT * FROM `project`
+                              $sql = "SELECT * FROM `project`
         WHERE year = (SELECT year FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
         AND term = (SELECT term FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
         AND project_id = :project_id";
-                            $stmt = $conn->prepare($sql);
-                            $stmt->bindParam(':default_system_id', $defaultSystemId);
-                            $stmt->bindParam(':project_id', $data['project_id']);
-                            $stmt->execute();
-                            $default = $stmt->fetch();
-                            ?>
+                              $stmt = $conn->prepare($sql);
+                              $stmt->bindParam(':default_system_id', $defaultSystemId);
+                              $stmt->bindParam(':project_id', $data['project_id']);
+                              $stmt->execute();
+                              $default = $stmt->fetch();
+                              ?>
 
-                            <td>
-                              <?php if (empty($default)) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-danger"></i>
-                                    <i>หมดเวลาการประเมิน</i>
+                              <td>
+                                <?php if (empty($default)) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-danger"></i>
+                                      <i>หมดเวลาการประเมิน</i>
+                                    </div>
                                   </div>
-                                </div>
-                              <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
-                                <div class="col-auto">
-                                  <div class="text-center">
-                                    <i class="bi bi-circle-fill text-success"></i>
-                                    <i>ประเมินเสร็จสิ้น</i>
+                                <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-success"></i>
+                                      <i>ประเมินเสร็จสิ้น</i>
+                                    </div>
                                   </div>
-                                </div>
-                              <?php endif; ?>
-                            </td>
+                                <?php endif; ?>
+                              </td>
+                              <td><a href="pointTest.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white">ประเมิน</a></td>
+                            </tr>
+                          <?php
+                          }
+                        }
+                      } else {
+                        $sql = "SELECT *
+                        FROM `project`
+                        WHERE teacher_id1 = :id
+                           OR teacher_id2 = :id
+                           OR referee_id = :id
+                           OR referee_id1 = :id
+                           OR referee_id2 = :id
+                        ORDER BY year DESC, term DESC;
+                        ";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->bindParam(':id', $_SESSION['teacher_id']);
+                        $stmt->execute();
+                        $datas = $stmt->fetchAll();
+
+                        if (empty($datas)) {
+                          echo "<tr><td colspan='20' class='text-center'>No data available</td></tr>";
+                        } else {
+                          $index = 1;
+                          foreach ($datas as $data) {
+                          ?>
+                            <tr>
+                              <th scope="row"><?php echo $index++; ?></th>
+                              <td><?php echo $data['project_id']; ?></td>
+                              <td><?php echo ($data['project_nameTH']); ?></td>
+                              <td><?php echo ($data['year']); ?></td>
+                              <td><?php echo ($data['term']); ?></td>
+                              <?php
+                              $defaultSystemId = 1; // หรือเปลี่ยนเป็นค่าอื่นตามที่ต้องการ
+
+                              $sql = "SELECT * FROM `project`
+        WHERE year = (SELECT year FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
+        AND term = (SELECT term FROM `defaultsystem` WHERE default_system_id = :default_system_id) 
+        AND project_id = :project_id";
+                              $stmt = $conn->prepare($sql);
+                              $stmt->bindParam(':default_system_id', $defaultSystemId);
+                              $stmt->bindParam(':project_id', $data['project_id']);
+                              $stmt->execute();
+                              $default = $stmt->fetch();
+                              ?>
+
+                              <td>
+                                <?php if (empty($default)) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-danger"></i>
+                                      <i>หมดเวลาการประเมิน</i>
+                                    </div>
+                                  </div>
+                                <?php elseif (giveStatusById($conn, $data['project_id'])) : ?>
+                                  <div class="col-auto">
+                                    <div class="text-center">
+                                      <i class="bi bi-circle-fill text-success"></i>
+                                      <i>ประเมินเสร็จสิ้น</i>
+                                    </div>
+                                  </div>
+                                <?php endif; ?>
+                              </td>
                               <td><a href="pointTest.php?id=<?php echo $data['project_id']; ?>" class="btn btn-info text-white">ประเมิน</a></td>
                             </tr>
                     <?php

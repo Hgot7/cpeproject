@@ -2,6 +2,12 @@
 session_start();
 require_once "../connect.php";
 
+if (!isset($_SESSION['admin_login'])) {
+  $_SESSION['error'] = 'กรุณาเข้าสู่ระบบ';
+  header('Location: ../index.php');
+  exit();
+}
+
 if (isset($_POST['update'])) {
   $news_id = $_POST['id'];
   $new_news_head = $_POST['input_news_head'];
@@ -107,27 +113,27 @@ if (isset($_POST['update'])) {
               ?>
 
               <div id="input_news_head">
-                <label class="form-label">หัวข่าว</label>
-                <input type="text" class="form-control" name="input_news_head" id="input_news_head" value="<?php echo $data['news_head'] ?? ''; ?>" placeholder="หัวข้อข่าวสาร">
+                <label class="form-label">หัวข่าว<span style="color: red;"> *</span></label>
+                <input type="text" class="form-control" name="input_news_head" id="input_news_head" value="<?php echo $data['news_head'] ?? ''; ?>" placeholder="หัวข้อข่าวสาร" required>
                 <input type="hidden" name="id" value="<?php echo $data['news_id'] ?? ''; ?>">
               </div>
 
 
-              <label class="form-label">เนื้อหาข่าว</label>
+              <label class="form-label">เนื้อหาข่าว<span style="color: red;"> *</span></label>
               <div class="form-floating" id="input_news_text">
-                <textarea class="form-control" name="input_news_text" id="input_news_text" placeholder="เนื้อหากำหนดการ"><?php echo isset($data['news_text']) ? $data['news_text'] : ''; ?></textarea>
+                <textarea class="form-control" name="input_news_text" id="input_news_text" required placeholder="เนื้อหากำหนดการ"><?php echo isset($data['news_text']) ? $data['news_text'] : ''; ?></textarea>
                 <label for="description">รายละเอียด</label>
               </div>
 
               <div id="input_year">
-                <label class="form-label">ปีการศึกษา</label>
-                <input type="number" class="form-control" name="input_news_year" id="input_news_year" value="<?php echo $data['year']; ?>" placeholder="ปีการศึกษา 25XX">
+                <label class="form-label">ปีการศึกษา<span style="color: red;"> *</span></label>
+                <input type="number" class="form-control" name="input_news_year" id="input_news_year" value="<?php echo $data['year']; ?>" placeholder="ปีการศึกษา" required>
               </div>
 
 
               <div id="input_term">
-                <label class="form-label">ภาคการศึกษา</label>
-                <select id="selectbox" name="input_news_term" class="form-select">
+                <label class="form-label">ภาคการศึกษา<span style="color: red;"> *</span></label>
+                <select id="selectbox" name="input_news_term" class="form-select" required>
                 <option value="" <?php if ($data['term'] == "") echo 'selected'; ?>>เลือกภาคการศึกษา</option>
                   <option value="1" <?php if ($data['term'] == "1") echo 'selected'; ?>>1</option>
                   <option value="2" <?php if ($data['term'] == "2") echo 'selected'; ?>>2</option>

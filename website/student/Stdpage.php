@@ -249,6 +249,9 @@ if (!isset($_SESSION['student_login'])) {
                           case "อาจารย์":
                             return $Position = "อ.";
                             break;
+                          case "อาจารย์ ดร.":
+                            return $Position = "อ.ดร.";
+                            break;
                           case "ดร.":
                             return $Position = "ดร.";
                             break;
